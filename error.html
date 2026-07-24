@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Seite nicht gefunden</title>
+  <title>Page Not Found</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="stylesheet" href="/responsive.css" />
   <style>
@@ -84,16 +84,16 @@
 </head>
 <body>
   <header class="site-header">
-    <a class="site-logo" href="/" aria-label="Datascience Seminar – Startseite">
+    <a class="site-logo" href="/" aria-label="Datascience Seminar – Home">
       <img src="/favicon.png" alt="" />
       <span class="site-logo-text">Datascience<span>Seminar</span></span>
     </a>
-    <button class="site-theme-toggle" id="theme" type="button" aria-label="Light Mode aktivieren" title="Light Mode aktivieren">&#9728;&#65039;</button>
+    <button class="site-theme-toggle" id="theme" type="button" aria-label="Enable light mode" title="Enable light mode">&#9728;&#65039;</button>
   </header>
   <main class="card">
-    <h1>404 – Seite nicht gefunden</h1>
-    <p>Die angeforderte Seite existiert nicht oder wurde verschoben.</p>
-    <p><a href="/">Zur Startseite</a></p>
+    <h1>404 – Page Not Found</h1>
+    <p>The requested page does not exist or has been moved.</p>
+    <p><a href="/">Back to Home</a></p>
   </main>
   <footer class="site-legal">
     <span>© 2026 Michel Lorenzen &amp; Sonja Waldenspuhl</span>
@@ -107,9 +107,9 @@
       function setTheme(light) {
         document.body.classList.toggle('light', light);
         button.textContent = light ? '\uD83C\uDF19' : '\u2600\uFE0F';
-        const nextTheme = light ? 'Dark Mode' : 'Light Mode';
-        button.setAttribute('aria-label', nextTheme + ' aktivieren');
-        button.title = nextTheme + ' aktivieren';
+        const nextTheme = light ? 'dark mode' : 'light mode';
+        button.setAttribute('aria-label', 'Enable ' + nextTheme);
+        button.title = 'Enable ' + nextTheme;
       }
 
       setTheme(localStorage.getItem('theme') === 'light');

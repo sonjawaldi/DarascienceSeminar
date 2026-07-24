@@ -3,6 +3,8 @@
 /* Use modern viewport units */
 html {
   scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Ensure proper rendering on all devices */
@@ -24,6 +26,8 @@ html {
 
 /* Improve text readability */
 body {
+  max-width: 100%;
+  overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }

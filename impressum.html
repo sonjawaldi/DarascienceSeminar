@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +10,17 @@
     :root { color-scheme:dark; --bg:#0f172a; --bg-end:#1e293b; --panel:rgba(17,24,39,.9); --text:#f8fafc; --muted:#b3becc; --accent:#38bdf8; --accent-2:#818cf8; --border:rgba(255,255,255,.12); --control-bg:rgba(255,255,255,.04); --control-hover:rgba(255,255,255,.08); --shadow:rgba(0,0,0,.25) }
     body.light { color-scheme:light; --bg:#eef4fa; --bg-end:#dce8f5; --panel:rgba(255,255,255,.94); --text:#172033; --muted:#475569; --accent:#1769b0; --accent-2:#5b55c9; --border:rgba(30,64,110,.14); --control-bg:rgba(255,255,255,.72); --control-hover:#e7eef7; --shadow:rgba(30,64,110,.16) }
     * { box-sizing:border-box }
-    body { margin:0; min-height:100vh; padding:24px; display:flex; flex-direction:column; align-items:center; gap:24px; font-family:Arial,Helvetica,sans-serif; color:var(--text); background:linear-gradient(135deg,var(--bg),var(--bg-end)); background-attachment:fixed }
-    main { width:min(900px,100%); display:grid; gap:18px }
+    html,body { max-width:100%; overflow-x:hidden }
+    body { margin:0; min-height:100vh; padding:24px; display:flex; flex-direction:column; align-items:center; gap:24px; position:relative; font-family:Arial,Helvetica,sans-serif; color:var(--text); background:linear-gradient(135deg,var(--bg),var(--bg-end)); background-attachment:fixed }
+    body::before,body::after { content:""; position:fixed; width:420px; height:420px; border-radius:50%; filter:blur(110px); opacity:.16; pointer-events:none; z-index:-1 }
+    body::before { top:-180px; left:-140px; background:var(--accent) }
+    body::after { right:-160px; bottom:-220px; background:var(--accent-2) }
+    main { width:min(900px,100%); min-width:0; display:grid; gap:18px }
     .intro { padding:28px 4px 10px }
     .eyebrow { margin:0 0 10px; color:var(--accent); font-size:.78rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase }
     h1 { margin:0 0 12px; font-size:clamp(2.2rem,6vw,4.2rem); letter-spacing:-.05em }
     .intro p,.card p,.card li { color:var(--muted); line-height:1.65 }
-    .card { padding:26px; border:1px solid var(--border); border-radius:18px; background:var(--panel); box-shadow:0 18px 50px var(--shadow); backdrop-filter:blur(18px) }
+    .card { min-width:0; padding:26px; overflow-wrap:anywhere; border:1px solid var(--border); border-radius:18px; background:var(--panel); box-shadow:0 18px 50px var(--shadow); backdrop-filter:blur(18px) }
     h2 { margin:0 0 16px; font-size:1.25rem }
     h3 { margin:22px 0 6px; font-size:1rem }
     .card p { margin:0 }
@@ -33,41 +37,41 @@
 </head>
 <body>
   <header class="site-header">
-    <a class="site-logo" href="/" aria-label="Datascience Seminar – Startseite">
+    <a class="site-logo" href="/" aria-label="Datascience Seminar – Home">
       <img src="/favicon.png" alt="">
       <span class="site-logo-text">Datascience<span>Seminar</span></span>
     </a>
-    <button class="site-theme-toggle" id="theme" type="button" aria-label="Light Mode aktivieren" title="Light Mode aktivieren">☀️</button>
+    <button class="site-theme-toggle" id="theme" type="button" aria-label="Enable light mode" title="Enable light mode">☀️</button>
   </header>
   <main>
     <section class="intro">
-      <p class="eyebrow">Projektangaben</p>
+      <p class="eyebrow">Project information</p>
       <h1>Legal Notice &amp; References</h1>
-      <p>Angaben zu den Verfasser:innen des Seminarprojekts und den wissenschaftlichen Arbeiten, auf denen Paper und Visualisierungen beruhen.</p>
+      <p>Information about the authors of the seminar project and the academic works on which the paper and visualizations are based.</p>
     </section>
     <section class="card" id="seminarpaper">
-      <h2>Verfasser:innen des Seminarpapers</h2>
+      <h2>Authors of the seminar paper</h2>
       <div class="authors">
-        <div class="author"><strong>Michel Lorenzen</strong><p>Autor des Seminarpapers und Mitwirkender am Projekt</p></div>
-        <div class="author"><strong>Sonja Waldenspuhl</strong><p>Autorin des Seminarpapers und Mitwirkende am Projekt</p></div>
+        <div class="author"><strong>Michel Lorenzen</strong><p>Author of the seminar paper and project contributor</p></div>
+        <div class="author"><strong>Sonja Waldenspuhl</strong><p>Author of the seminar paper and project contributor</p></div>
       </div>
-      <h3>Seminarpaper</h3>
-      <p><cite>Concepts and Algorithms for Multi-Criteria Route Optimization: A Comparison of Skyline Approaches</cite>, 24. Juli 2026.</p>
+      <h3>Seminar paper</h3>
+      <p><cite>Concepts and Algorithms for Multi-Criteria Route Optimization: A Comparison of Skyline Approaches</cite>, July 24, 2026.</p>
     </section>
     <section class="card">
-      <h2>Referenzpaper und Autor:innen</h2>
+      <h2>Reference papers and authors</h2>
       <ol class="references">
         <li id="dijkstra-astar"><cite>Dijkstra &amp; A*</cite><br>TODO</li>
-        <li id="route-skyline"><cite>Route Skyline Queries: A Multi-Preference Path Planning Approach</cite><br>Hans-Peter Kriegel, Matthias Renz und Matthias Schubert. IEEE 26th International Conference on Data Engineering (ICDE), S. 261–272, 2010.</li>
-        <li id="linear-skyline"><cite>Linear Path Skyline Computation in Bicriteria Networks</cite><br>Michael Shekelyan, Gregor Jossé, Matthias Schubert und Hans-Peter Kriegel. International Conference on Database Systems for Advanced Applications, S. 173–187, Springer, 2014.</li>
-        <li id="bc-irnn"><cite>Best-Compromise In-Route Nearest Neighbor Queries</cite><br>Elham Ahmadi, Camila F. Costa und Mario A. Nascimento. 25th ACM SIGSPATIAL International Conference on Advances in Geographic Information Systems, S. 1–10, 2017.</li>
+        <li id="route-skyline"><cite>Route Skyline Queries: A Multi-Preference Path Planning Approach</cite><br>Hans-Peter Kriegel, Matthias Renz, and Matthias Schubert. IEEE 26th International Conference on Data Engineering (ICDE), pp. 261–272, 2010.</li>
+        <li id="linear-skyline"><cite>Linear Path Skyline Computation in Bicriteria Networks</cite><br>Michael Shekelyan, Gregor Jossé, Matthias Schubert, and Hans-Peter Kriegel. International Conference on Database Systems for Advanced Applications, pp. 173–187, Springer, 2014.</li>
+        <li id="bc-irnn"><cite>Best-Compromise In-Route Nearest Neighbor Queries</cite><br>Elham Ahmadi, Camila F. Costa, and Mario A. Nascimento. 25th ACM SIGSPATIAL International Conference on Advances in Geographic Information Systems, pp. 1–10, 2017.</li>
       </ol>
     </section>
     <section class="card">
       <h2>Note</h2>
       <p>This website was created as part of a data science seminar project on multi-criteria route optimization. It is intended for academic teaching and as an interactive illustration of the algorithms discussed in the seminar paper. The concepts and research findings presented in the referenced works remain attributed to their respective authors and publications.</p>
     </section>
-    <a class="back" href="/">← Zurück zur Startseite</a>
+    <a class="back" href="/">← Back to home</a>
   </main>
   <footer class="site-legal">
     <span>© 2026 Michel Lorenzen &amp; Sonja Waldenspuhl</span>
@@ -77,7 +81,7 @@
   <script>
     (function(){
       const button=document.getElementById('theme');
-      function setTheme(light){document.body.classList.toggle('light',light);button.textContent=light?'🌙':'☀️';const next=light?'Dark Mode':'Light Mode';button.setAttribute('aria-label',next+' aktivieren');button.title=next+' aktivieren'}
+      function setTheme(light){document.body.classList.toggle('light',light);button.textContent=light?'🌙':'☀️';const next=light?'dark mode':'light mode';button.setAttribute('aria-label','Enable '+next);button.title='Enable '+next}
       setTheme(localStorage.getItem('theme')==='light');
       button.addEventListener('click',function(){const light=!document.body.classList.contains('light');setTheme(light);localStorage.setItem('theme',light?'light':'dark')});
     }());
