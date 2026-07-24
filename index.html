@@ -126,22 +126,22 @@
       justify-content: center;
     }
     .algorithm-tree {
-      width: min(600px, 100%);
+      width: 100%;
+      min-width: 0;
       margin-top: 34px;
-      margin-right: auto;
-      margin-left: auto;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: 54px;
-      justify-items: stretch;
+      grid-template-columns: minmax(0, 1fr) clamp(20px, 4vw, 42px) minmax(0, 1fr) clamp(32px, 6vw, 68px) minmax(0, 1fr) clamp(20px, 4vw, 42px) minmax(0, 1fr);
+      grid-template-rows: repeat(2, auto);
+      row-gap: 26px;
+      align-items: center;
+    }
+    .algorithm-tree-scroll {
+      width: 100%;
+      overflow: visible;
     }
     .algorithm-node {
       display: flex;
       justify-content: center;
-    }
-    .algorithm-node.root,
-    .algorithm-node.brsc {
-      grid-column: 1 / -1;
     }
     .algorithm-node .button {
       flex-direction: column;
@@ -150,86 +150,115 @@
       max-width: 270px;
       padding: 13px 15px;
     }
+    .algorithm-button-wrap { position:relative; width:100%; max-width:270px; }
+    .algorithm-button-wrap > .button { max-width:none; padding-right:44px; }
+    .reference-info {
+      position:absolute; top:50%; right:11px; z-index:2;
+      display:inline-flex; align-items:center; justify-content:center;
+      width:28px; height:28px;
+      border:0;
+      border-radius:50%;
+      background:transparent;
+      color:#fff;
+      line-height:1; text-decoration:none;
+      transform:translateY(-50%);
+      transition:background .18s ease,transform .18s ease;
+    }
+    .reference-info svg { width:15px; height:15px; stroke:currentColor; }
+    .reference-info:hover {
+      background:rgba(255,255,255,.14);
+      transform:translateY(-50%) scale(1.07);
+    }
+    .reference-info:focus-visible {
+      outline:3px solid rgba(255,255,255,.88);
+      outline-offset:3px;
+      background:rgba(255,255,255,.24);
+    }
+    .reference-info::after {
+      content:attr(data-author); position:absolute; left:50%; bottom:calc(100% + 10px);
+      width:max-content; max-width:230px; padding:8px 11px; border:1px solid var(--border);
+      border-radius:10px; background:var(--panel); color:var(--text);
+      box-shadow:0 10px 26px var(--shadow); font-size:.72rem; font-weight:600;
+      line-height:1.35; text-align:center; white-space:normal; opacity:0;
+      pointer-events:none; transform:translate(-50%,4px);
+      transition:opacity .15s ease,transform .15s ease;
+    }
+    .reference-info::before {
+      content:""; position:absolute; left:50%; bottom:calc(100% + 5px);
+      width:9px; height:9px;
+      border-right:1px solid var(--border); border-bottom:1px solid var(--border);
+      background:var(--panel); opacity:0;
+      pointer-events:none; transform:translateX(-50%) rotate(45deg);
+      transition:opacity .15s ease;
+    }
+    .reference-info:hover::after,.reference-info:focus-visible::after { opacity:1; transform:translate(-50%,0); }
+    .reference-info:hover::before,.reference-info:focus-visible::before { opacity:1; }
     .algorithm-node small {
       color: rgba(255, 255, 255, 0.75);
       font-size: 0.68rem;
       font-weight: 600;
       letter-spacing: 0.02em;
     }
-    .tree-down {
-      grid-column: 1 / -1;
-      width: 2px;
-      height: 34px;
-      margin: 0 auto;
+    .algorithm-node.root { grid-column: 1; grid-row: 1 / 3; }
+    .algorithm-node.brsc { grid-column: 3; grid-row: 1 / 3; }
+    .algorithm-node.arsc { grid-column: 5; grid-row: 1; }
+    .algorithm-node.blrsc { grid-column: 5; grid-row: 2; }
+    .algorithm-node.bc-irnn { grid-column: 7; grid-row: 2; }
+    .tree-arrow {
+      height: 2px;
+      width: 100%;
       background: var(--muted);
       position: relative;
     }
-    .tree-down::after,
-    .blrsc-down::after {
+    .tree-arrow::after,
+    .branch-arm::after {
       content: "";
       position: absolute;
-      left: 50%;
-      bottom: -1px;
+      right: 0;
+      top: 50%;
       width: 8px;
       height: 8px;
       border-right: 2px solid var(--muted);
       border-bottom: 2px solid var(--muted);
-      transform: translateX(-50%) rotate(45deg);
+      transform: translateY(-50%) rotate(-45deg);
     }
+    .root-arrow { grid-column: 2; grid-row: 1 / 3; }
+    .blrsc-arrow { grid-column: 6; grid-row: 2; }
     .tree-branches {
-      grid-column: 1 / -1;
-      height: 42px;
-      margin: 24px 25% 0;
-      border-top: 2px solid var(--muted);
-      border-right: 2px solid var(--muted);
-      border-left: 2px solid var(--muted);
+      grid-column: 4;
+      grid-row: 1 / 3;
+      align-self: stretch;
       position: relative;
     }
     .tree-branches::before {
       content: "";
       position: absolute;
+      top: 25%;
+      bottom: 25%;
       left: 50%;
-      bottom: 100%;
       width: 2px;
-      height: 24px;
       background: var(--muted);
-      transform: translateX(-50%);
     }
-    .algorithm-node.arsc {
-      grid-column: 1;
-    }
-    .algorithm-node.blrsc {
-      grid-column: 2;
-    }
-    .algorithm-node.arsc,
-    .algorithm-node.blrsc {
-      position: relative;
-    }
-    .algorithm-node.arsc::before,
-    .algorithm-node.blrsc::before {
+    .tree-branches::after {
       content: "";
       position: absolute;
-      top: -7px;
-      left: 50%;
-      width: 8px;
-      height: 8px;
-      border-right: 2px solid var(--muted);
-      border-bottom: 2px solid var(--muted);
-      transform: translateX(-50%) rotate(45deg);
-    }
-    .blrsc-down {
-      grid-column: 2;
-      width: 2px;
-      height: 34px;
-      margin: 0 auto;
+      top: 50%;
+      left: 0;
+      width: 50%;
+      height: 2px;
       background: var(--muted);
+    }
+    .branch-arm {
+      position: absolute;
+      left: 50%;
+      right: 0;
+      height: 2px;
+      background: var(--muted);
+    }
+    .branch-arm.top { top: 25%; }
+    .branch-arm.bottom { top: 75%; }
+    .algorithm-tree-scroll {
       position: relative;
-    }
-    .algorithm-node.bc-irnn {
-      grid-column: 2;
-    }
-    .resource-actions {
-      margin-top: 18px;
     }
     .button.powerpoint {
       background: transparent;
@@ -238,6 +267,19 @@
     }
     .button.powerpoint:hover {
       background: var(--control-hover);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+    .header-actions a.button {
+      min-height: 42px;
+      padding: 10px 15px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      box-shadow: none;
     }
     .language-toggle {
       margin-top: 18px;
@@ -301,16 +343,109 @@
         gap: 10px;
       }
       .algorithm-tree {
-        column-gap: 18px;
+        margin-top: 28px;
+        grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+        grid-template-rows: auto 34px auto 50px auto 34px auto;
+        column-gap: 8px;
+        row-gap: 0;
+        align-items: center;
+      }
+      .algorithm-node.root {
+        grid-column: 1 / 4;
+        grid-row: 1;
+      }
+      .root-arrow {
+        grid-column: 2;
+        grid-row: 2;
+      }
+      .algorithm-node.brsc {
+        grid-column: 1 / 4;
+        grid-row: 3;
+      }
+      .tree-branches {
+        grid-column: 1 / 4;
+        grid-row: 4;
+        align-self: stretch;
+      }
+      .algorithm-node.arsc {
+        grid-column: 1;
+        grid-row: 5;
+      }
+      .algorithm-node.blrsc {
+        grid-column: 3;
+        grid-row: 5;
+      }
+      .blrsc-arrow {
+        grid-column: 3;
+        grid-row: 6;
+        justify-self: center;
+      }
+      .algorithm-node.bc-irnn {
+        grid-column: 3;
+        grid-row: 7;
+      }
+      .tree-arrow {
+        width: 2px;
+        height: 100%;
+        justify-self: center;
+      }
+      .tree-arrow::after {
+        right: 50%;
+        top: auto;
+        bottom: 1px;
+        transform: translateX(50%) rotate(45deg);
+      }
+      .tree-branches::before {
+        top: 0;
+        bottom: 50%;
+        left: 50%;
+      }
+      .tree-branches::after {
+        top: 50%;
+        left: 25%;
+        width: 50%;
+      }
+      .branch-arm {
+        top: 50% !important;
+        bottom: 0;
+        width: 2px;
+        height: auto;
+        background: var(--muted);
+      }
+      .branch-arm.top {
+        left: 25%;
+        right: auto;
+      }
+      .branch-arm.bottom {
+        left: 75%;
+        right: auto;
+      }
+      .branch-arm::after {
+        right: 50%;
+        top: auto;
+        bottom: 1px;
+        transform: translateX(50%) rotate(45deg);
       }
       .algorithm-node .button {
         width: 100%;
-        padding-right: 8px;
+        padding-right: 36px;
         padding-left: 8px;
       }
-      .tree-branches {
-        margin-right: 25%;
-        margin-left: 25%;
+      .algorithm-button-wrap {
+        max-width: 270px;
+      }
+      .site-header {
+        flex-wrap: wrap;
+      }
+      .header-actions {
+        order: 3;
+        width: 100%;
+      }
+      .header-actions a.button {
+        width: auto;
+        flex: 1;
+        padding: 10px 12px;
+        font-size: 0.8rem;
       }
       a.button {
         width: 100%;
@@ -347,6 +482,10 @@
       <img src="/favicon.png" alt="" />
       <span class="site-logo-text">Datascience<span>Seminar</span></span>
     </a>
+    <nav class="header-actions" aria-label="Projektressourcen">
+      <a class="button secondary" href="/Datascience_Projekt%20(13).pdf" download="Current_Paper.pdf">Download paper</a>
+      <a class="button powerpoint" href="https://1drv.ms/p/c/ce9f3197ab2af297/IQBs65Z07sb7QoUPpoOQToKIAXlUGvcXHBHZ4poMEWfKeKE">View presentation</a>
+    </nav>
     <button class="site-theme-toggle" id="theme" type="button" aria-label="Light Mode aktivieren" title="Light Mode aktivieren">&#9728;&#65039;</button>
   </header>
   <main class="card">
@@ -354,31 +493,37 @@
     <h1>Concepts and Algorithms for <span>Multi-Criteria Route Optimization.</span></h1>
     <p>Explore and compare skyline approaches for route planning: from graph search with Dijkstra and A* to compact sets of linearly optimal paths in bicriteria networks.</p>
 
-    <div class="algorithm-tree" aria-label="Abhängigkeiten der Algorithmen">
-      <div class="algorithm-node root">
-        <a class="button" href="/DijkstraA/">Dijkstra &amp; A*<small>Graph-search foundation</small></a>
+    <div class="algorithm-tree-scroll">
+      <div class="algorithm-tree" aria-label="Abhängigkeiten der Algorithmen">
+        <div class="algorithm-node root">
+          <div class="algorithm-button-wrap"><a class="button" href="/DijkstraA/">Dijkstra &amp; A*<small>Graph-search foundation</small></a><a class="reference-info" href="/impressum.html#dijkstra-astar" data-author="TODO" aria-label="Quellenplatzhalter für Dijkstra und A* öffnen"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><path d="M12 10.8v6" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/></svg></a></div>
+        </div>
+        <div class="tree-arrow root-arrow" aria-hidden="true"></div>
+        <div class="algorithm-node brsc">
+          <div class="algorithm-button-wrap"><a class="button" href="/BRSC/">BRSC<small>Basic route skyline</small></a><a class="reference-info" href="/impressum.html#route-skyline" data-author="Kriegel, Renz &amp; Schubert" aria-label="Referenz von Kriegel, Renz und Schubert öffnen"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><path d="M12 10.8v6" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/></svg></a></div>
+        </div>
+        <div class="tree-branches" aria-hidden="true">
+          <span class="branch-arm top"></span>
+          <span class="branch-arm bottom"></span>
+        </div>
+        <div class="algorithm-node arsc">
+          <div class="algorithm-button-wrap"><a class="button" href="/ARSC/">ARSC<small>Advanced pruning</small></a><a class="reference-info" href="/impressum.html#route-skyline" data-author="Kriegel, Renz &amp; Schubert" aria-label="Referenz von Kriegel, Renz und Schubert öffnen"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><path d="M12 10.8v6" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/></svg></a></div>
+        </div>
+        <div class="algorithm-node blrsc">
+          <div class="algorithm-button-wrap"><a class="button" href="/Linear/">BLRSC<small>Linear skyline</small></a><a class="reference-info" href="/impressum.html#linear-skyline" data-author="Shekelyan, Jossé, Schubert &amp; Kriegel" aria-label="Referenz von Shekelyan, Jossé, Schubert und Kriegel öffnen"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><path d="M12 10.8v6" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/></svg></a></div>
+        </div>
+        <div class="tree-arrow blrsc-arrow" aria-hidden="true"></div>
+        <div class="algorithm-node bc-irnn">
+          <div class="algorithm-button-wrap"><a class="button" href="/BC-IRNN/">BC-IRNN<small>POI route extension</small></a><a class="reference-info" href="/impressum.html#bc-irnn" data-author="Ahmadi, Costa &amp; Nascimento" aria-label="Referenz von Ahmadi, Costa und Nascimento öffnen"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke-width="1.8"/><path d="M12 10.8v6" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/></svg></a></div>
+        </div>
       </div>
-      <div class="tree-down" aria-hidden="true"></div>
-      <div class="algorithm-node brsc">
-        <a class="button" href="/BRSC/">BRSC<small>Basic route skyline</small></a>
-      </div>
-      <div class="tree-branches" aria-hidden="true"></div>
-      <div class="algorithm-node arsc">
-        <a class="button" href="/ARSC/">ARSC<small>Advanced pruning</small></a>
-      </div>
-      <div class="algorithm-node blrsc">
-        <a class="button" href="/Linear/">BLRSC<small>Linear skyline</small></a>
-      </div>
-      <div class="blrsc-down" aria-hidden="true"></div>
-      <div class="algorithm-node bc-irnn">
-        <a class="button" href="/BC-IRNN/">BC-IRNN<small>POI route extension</small></a>
-      </div>
-    </div>
-    <div class="actions resource-actions">
-      <a class="button secondary" href="/Datascience_Projekt%20(13).pdf" download="Current_Paper.pdf">Download paper</a>
-      <a class="button powerpoint" href="https://1drv.ms/p/c/ce9f3197ab2af297/IQBs65Z07sb7QoUPpoOQToKIAXlUGvcXHBHZ4poMEWfKeKE">View presentation</a>
     </div>
   </main>
+  <footer class="site-legal">
+    <span>© 2026 Michel Lorenzen &amp; Sonja Waldenspuhl</span>
+    <span aria-hidden="true">·</span>
+    <a class="legal-link" href="/impressum.html">Legal Notice &amp; References</a>
+  </footer>
   <script>
     (function () {
       const button = document.getElementById('theme');

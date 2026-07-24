@@ -116,6 +116,36 @@ img {
   border: 0;
 }
 
+.legal-link {
+  color: var(--muted, #94a3b8);
+  font-size: 0.82rem;
+  text-underline-offset: 3px;
+}
+
+.legal-link:hover {
+  color: var(--text, #f8fafc);
+}
+
+.site-legal {
+  width: min(1280px, 100%);
+  margin: auto auto 0;
+  padding: 14px 4px 2px;
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 0;
+  border: 0;
+  border-top: 1px solid var(--border, var(--line, rgba(255, 255, 255, 0.12)));
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted, #94a3b8);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
 /* Responsive containers */
 .container {
   width: 100%;
