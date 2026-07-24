@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A* Search with Heuristics</title>
+<link rel="stylesheet" href="/responsive.css" />
 <style>
   :root{
     --bg:#0E1116; --panel:#171B22; --panel2:#1E242D; --line:#2A313C;
@@ -19,26 +20,51 @@
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html,body{height:100%;}
-  body{background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; overflow:hidden; display:flex; flex-direction:column; padding:16px 22px; gap:12px;}
-
-  header{display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:10px;}
-  h1{font-size:22px; font-weight:600; letter-spacing:-0.02em;}
-  .formula{font-size:19px; font-variant-numeric:tabular-nums;}
-  .formula b{color:var(--f); font-weight:600;}
-  .formula .g{color:var(--fg); font-weight:600;} .formula .w{color:var(--fw); font-weight:600;} .formula .h{color:var(--fh); font-weight:600;}
+  :root{
+    color-scheme: dark;
+    --bg:#0f172a;
+    --panel:#111827;
+    --text:#f8fafc;
+    --muted:#94a3b8;
+    --accent:#38bdf8;
+    --accent-2:#818cf8;
+    --line:rgba(255,255,255,0.12);
+  }
+  body{margin:0; min-height:100vh; font-family:Arial, Helvetica, sans-serif; background:linear-gradient(135deg, var(--bg), #1e293b); color:var(--text); display:grid; place-items:center; padding:24px; overflow:auto;}
+  .page-shell{
+    width:min(1280px, 100%);
+    background:rgba(17,24,39,0.9);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:24px;
+    padding:28px;
+    box-shadow:0 20px 45px rgba(0,0,0,0.25);
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .page-header{display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;}
+  .page-title-wrap{display:flex; flex-direction:column; gap:8px;}
+  h1{font-size:22px; font-weight:600; letter-spacing:-0.02em; margin:0;}
+  .formula{font-size:19px; font-variant-numeric:tabular-nums; color:var(--muted);}
+  .formula b{color:var(--accent); font-weight:600;}
+  .formula .g{color:#c084fc; font-weight:600;} .formula .w{color:#f472b6; font-weight:600;} .formula .h{color:#fb923c; font-weight:600;}
+  .button{display:inline-flex; align-items:center; justify-content:center; text-decoration:none; padding:10px 16px; border-radius:999px; font-weight:700; background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:white; transition:transform 0.2s ease, box-shadow 0.2s ease; border:0; cursor:pointer;}
+  .button:hover{transform:translateY(-2px);}
+  .button.secondary{background:transparent; border:1px solid rgba(255,255,255,0.2); color:var(--text);}
 
   .controls{display:flex; flex-wrap:wrap; align-items:center; gap:12px;}
-  button{background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:9px 15px; font-size:14px; font-weight:500; cursor:pointer; transition:.15s;}
-  button:hover{background:#28303B; border-color:#3A4350;}
+  button{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.2); border-radius:999px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:.15s;}
+  button:hover{background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.25);}
   button:active{transform:scale(.97);}
-  button.primary{background:var(--accent); border-color:var(--accent); color:#fff; min-width:118px;}
-  button.primary:hover{background:#2E78C4;}
-  .speed{display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:9px; overflow:hidden;}
+  button.primary{background:linear-gradient(90deg, var(--accent), var(--accent-2)); border-color:transparent; color:#fff; min-width:118px;}
+  button.primary:hover{filter:brightness(1.05);}
+  .speed{display:inline-flex; align-items:center; border:1px solid rgba(255,255,255,0.2); border-radius:999px; overflow:hidden; background:rgba(255,255,255,0.04);}
   .speed .lbl{font-size:12px; color:var(--muted); padding:0 10px 0 12px;}
-  .speed button{border:none; border-radius:0; border-left:1px solid var(--line); padding:9px 13px; font-variant-numeric:tabular-nums;}
-  .speed button.on{background:var(--accent); color:#fff;}
-  .verdict{margin-left:auto; font-size:14px; color:var(--muted); background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:8px 15px; max-width:520px;}
-  .verdict b{color:var(--goal); font-weight:600;}
+  .speed button{border:none; border-radius:0; border-left:1px solid rgba(255,255,255,0.12); padding:9px 13px; font-variant-numeric:tabular-nums;}
+  .speed button:first-of-type{border-left:0;}
+  .speed button.on{background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#fff;}
+  .verdict{margin-left:auto; font-size:14px; color:var(--muted); background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:8px 15px; max-width:520px;}
+  .verdict b{color:#34d399; font-weight:600;}
 
   main{flex:1; min-height:0; display:flex; gap:16px;}
   .col{flex:1; min-width:0; display:flex; flex-direction:column; gap:9px;}
@@ -58,25 +84,236 @@
   .item b{color:var(--text); font-weight:600;}
   .dot{width:11px; height:11px; border-radius:50%; flex:none;}
   .sep{width:1px; height:15px; background:var(--line);}
+
+  /* ========== MOBILE RESPONSIVE ========== */
+  @media (max-width: 1024px) {
+    body { padding: 12px 16px; }
+    h1 { font-size: 18px; }
+    .formula { font-size: 16px; }
+    header { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 10px 12px;
+      gap: 10px;
+    }
+    h1 {
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+    .formula {
+      font-size: 14px;
+      order: 3;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .controls {
+      gap: 8px;
+      font-size: 13px;
+    }
+    button {
+      padding: 7px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+    }
+    .speed {
+      border-radius: 6px;
+    }
+    .speed .lbl { font-size: 11px; padding: 0 8px 0 10px; }
+    .speed button { padding: 7px 10px; }
+    .verdict {
+      font-size: 12px;
+      padding: 6px 12px;
+      margin-left: 0;
+      order: 4;
+      width: 100%;
+      margin-top: 8px;
+      max-width: 100%;
+    }
+    main {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .col {
+      gap: 6px;
+    }
+    .col-head {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .col-head .name {
+      font-size: 14px;
+      flex-wrap: wrap;
+      gap: 6px;
+      width: 100%;
+    }
+    .col-head .cnt {
+      font-size: 12px;
+      order: 3;
+      width: 100%;
+    }
+    .col-head .cnt b {
+      font-size: 18px;
+    }
+    .tag {
+      font-size: 11px;
+      padding: 1px 7px;
+    }
+    .dir {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+    .canvas-wrap {
+      min-height: 280px;
+      border-radius: 8px;
+    }
+    footer {
+      gap: 6px 16px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .item {
+      font-size: 11px;
+      gap: 5px;
+    }
+    .dot { width: 9px; height: 9px; }
+    .sep { height: 12px; }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      padding: 8px;
+      gap: 8px;
+      min-height: 100dvh;
+    }
+    h1 {
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+    header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+    .formula {
+      font-size: 12px;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    button {
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 5px;
+      min-width: auto;
+    }
+    button.primary {
+      grid-column: 1 / -1;
+      min-width: 100%;
+    }
+    .speed {
+      grid-column: 1 / -1;
+      border-radius: 5px;
+    }
+    .speed .lbl { font-size: 10px; padding: 0 6px; }
+    .speed button { padding: 6px 8px; font-size: 11px; }
+    .verdict {
+      grid-column: 1 / -1;
+    }
+    main { 
+      gap: 10px;
+      flex-direction: column;
+    }
+    .mobile-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .mobile-tabs button {
+      flex: 1;
+      min-width: 70px;
+      padding: 8px 6px;
+      font-size: 11px;
+      border-radius: 5px;
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mobile-tabs button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      font-weight: bold;
+    }
+    .col {
+      display: none;
+    }
+    .col.visible {
+      display: flex;
+    }
+    .col-head {
+      gap: 6px;
+    }
+    .col-head .name {
+      font-size: 13px;
+    }
+    .col-head .cnt {
+      font-size: 11px;
+    }
+    .col-head .cnt b {
+      font-size: 16px;
+    }
+    .tag { font-size: 10px; padding: 1px 5px; }
+    .dir { padding: 3px 6px; font-size: 10px; }
+    .canvas-wrap {
+      min-height: 250px;
+    }
+    footer {
+      gap: 4px 12px;
+      padding: 6px 10px;
+      font-size: 10px;
+    }
+    .item { font-size: 10px; gap: 4px; }
+    .dot { width: 8px; height: 8px; }
+  }
+
 </style>
 </head>
 <body>
-  <header>
-    <h1>A* Search with Heuristics — Dijkstra vs. A*</h1>
-    <div class="formula"><b>f(n)</b> = <span class="g">g(n)</span> + <span class="w">w</span> · <span class="h">h(n)</span></div>
-  </header>
+  <main class="page-shell">
+    <header class="page-header">
+      <div class="page-title-wrap">
+        <h1>A* Search with Heuristics — Dijkstra vs. A*</h1>
+        <div class="formula"><b>f(n)</b> = <span class="g">g(n)</span> + <span class="w">w</span> · <span class="h">h(n)</span></div>
+      </div>
+      <a class="button secondary" href="/">Home</a>
+    </header>
 
-  <div class="controls">
-    <button class="primary" id="play">▶ Play both</button>
-    <button id="step">Step →</button>
-    <button id="reset">↻ Reset</button>
-    <button id="theme">☀ Light</button>
-    <div class="speed"><span class="lbl">Speed</span><button data-sp="0.5">0.5×</button><button data-sp="1" class="on">1×</button><button data-sp="2">2×</button></div>
-    <div class="verdict" id="verdict">Both searches find the same optimal path — watch how many nodes each one explores.</div>
+    <div class="controls">
+      <button class="primary" id="play">▶ Play</button>
+      <button id="step">Step →</button>
+      <button id="reset">↻ Reset</button>
+      <button id="theme">☀ Light</button>
+      <div class="speed"><span class="lbl">Speed</span><button data-sp="0.5">0.5×</button><button data-sp="1" class="on">1×</button><button data-sp="2">2×</button></div>
+      <div class="verdict" id="verdict">Both searches find the same optimal path — watch how many nodes each one explores.</div>
+    </div>
+
+  <!-- Mobile Tab Navigation -->
+  <div class="mobile-tabs" id="mobileTabs" style="display:none;">
+    <button class="active" data-tab="dijkstra">Dijkstra</button>
+    <button data-tab="astar">A*</button>
   </div>
 
   <main>
-    <div class="col">
+    <div class="col" id="col-dijkstra">
       <div class="col-head">
         <span class="name"><span id="name-d">Dijkstra</span>
           <span class="tag"><span class="c-w">w</span> = 0</span>
@@ -86,7 +323,7 @@
       </div>
       <div class="canvas-wrap"><canvas id="cv-d"></canvas></div>
     </div>
-    <div class="col">
+    <div class="col" id="col-astar">
       <div class="col-head">
         <span class="name">A*
           <span class="tag"><span class="c-w">w</span> = 1</span>
@@ -97,17 +334,18 @@
     </div>
   </main>
 
-  <footer>
-    <span class="item"><span class="dot" style="background:var(--start)"></span><b>Start</b></span>
-    <span class="item"><span class="dot" style="background:var(--goal)"></span><b>Goal</b></span>
-    <span class="item"><span class="dot" style="background:var(--open)"></span><b>Frontier (open)</b></span>
-    <span class="item"><span class="dot" style="background:var(--closed)"></span><b>Visited (closed)</b></span>
-    <span class="item"><span class="dot" style="background:var(--path)"></span><b>Path</b></span>
-    <div class="sep"></div>
-    <span class="item">numbers on edges = <b>edge cost</b></span>
-    <span class="item"><b>g(n)</b> cost start→n</span>
-    <span class="item"><b>h(n)</b> straight-line estimate n→goal</span>
-  </footer>
+    <footer>
+      <span class="item"><span class="dot" style="background:var(--start)"></span><b>Start</b></span>
+      <span class="item"><span class="dot" style="background:var(--goal)"></span><b>Goal</b></span>
+      <span class="item"><span class="dot" style="background:var(--open)"></span><b>Frontier (open)</b></span>
+      <span class="item"><span class="dot" style="background:var(--closed)"></span><b>Visited (closed)</b></span>
+      <span class="item"><span class="dot" style="background:var(--path)"></span><b>Path</b></span>
+      <div class="sep"></div>
+      <span class="item">numbers on edges = <b>edge cost</b></span>
+      <span class="item"><b>g(n)</b> cost start→n</span>
+      <span class="item"><b>h(n)</b> straight-line estimate n→goal</span>
+    </footer>
+  </main>
 
 <script>
 (function(){
@@ -229,7 +467,7 @@
   function setPlay(on){
     clearInterval(timer); timer=null;
     if(on){ playBtn.textContent='❚❚ Pause'; timer=setInterval(tick, BASE/speed); }
-    else { playBtn.textContent='▶ Play both'; }
+    else { playBtn.textContent='▶ Play'; }
   }
   playBtn.onclick=()=>{ if(panels.every(p=>p.s.done)) resetAll(); setPlay(!timer); };
   document.getElementById('step').onclick=()=>{ if(timer)setPlay(false); if(panels.every(p=>p.s.done)) resetAll(); panels.forEach(stepPanel); checkDone(); };
@@ -267,6 +505,65 @@
     else if(e.code==='KeyR'){ document.getElementById('reset').click(); }
   });
   window.addEventListener('resize',layout);
+
+  // Mobile Tab Navigation
+  const mobileTabs = document.getElementById('mobileTabs');
+  const tabButtons = mobileTabs.querySelectorAll('button');
+  let currentTab = 'dijkstra';
+  
+  function isMobile() {
+    return window.innerWidth <= 480;
+  }
+  
+  function showMobileTabs() {
+    if (isMobile()) {
+      mobileTabs.style.display = 'flex';
+    } else {
+      mobileTabs.style.display = 'none';
+    }
+  }
+  
+  function switchTab(tabName) {
+    // Reset reverse state when leaving Dijkstra
+    if (tabName !== 'dijkstra' && panels[0].reverse) {
+      panels[0].reverse = false;
+      document.getElementById('dir-d').classList.remove('on');
+      document.getElementById('dir-d').textContent = '↔ Reverse (from goal)';
+      document.getElementById('name-d').textContent = 'Dijkstra';
+    }
+    
+    // Hide all columns
+    document.getElementById('col-dijkstra').classList.remove('visible');
+    document.getElementById('col-astar').classList.remove('visible');
+    
+    // Update button states
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    
+    // Show selected column and mark button as active
+    if (tabName === 'dijkstra') {
+      document.getElementById('col-dijkstra').classList.add('visible');
+      tabButtons[0].classList.add('active');
+    } else if (tabName === 'astar') {
+      document.getElementById('col-astar').classList.add('visible');
+      tabButtons[1].classList.add('active');
+    }
+    
+    currentTab = tabName;
+    resetAll();
+    layout();
+  }
+  
+  // Tab button event listeners
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchTab(btn.dataset.tab);
+    });
+  });
+  
+  // Show/hide mobile tabs on resize
+  window.addEventListener('resize', showMobileTabs);
+  showMobileTabs();
+  switchTab(currentTab);
 
   layout(); resetAll();
 })();

@@ -1,0 +1,114 @@
+/* Global Responsive CSS for All Pages */
+
+/* Use modern viewport units */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure proper rendering on all devices */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Touch-friendly button sizes for mobile */
+@media (max-width: 768px) {
+  button,
+  a.button,
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 44px; /* iOS recommended touch target */
+    min-width: 44px;
+  }
+}
+
+/* Improve text readability */
+body {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* Flexible images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Responsive containers */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 8px;
+  }
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+  body {
+    padding: 8px;
+  }
+  
+  header {
+    gap: 6px !important;
+  }
+  
+  main {
+    gap: 8px !important;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  body {
+    font-size: 15px;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.4rem;
+  }
+}
+
+/* Ensure readable fonts on high DPI displays */
+@media (min-device-pixel-ratio: 2),
+       (min-resolution: 192dpi) {
+  body {
+    -webkit-text-size-adjust: none;
+    -ms-text-size-adjust: none;
+  }
+}
+
+/* Hide horizontal scrollbar on small devices */
+@media (max-width: 480px) {
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* Improve spacing for small devices */
+@media (max-width: 480px) {
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 12px;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    margin-bottom: 12px;
+  }
+}

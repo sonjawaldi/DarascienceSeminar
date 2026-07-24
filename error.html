@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Seite nicht gefunden</title>
+  <link rel="stylesheet" href="/responsive.css" />
   <style>
     body {
       margin: 0;
@@ -23,6 +24,44 @@
       padding: 32px;
     }
     a { color: #7dd3fc; }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 16px;
+        min-height: 100dvh;
+      }
+      .card {
+        max-width: 100%;
+        padding: 24px 16px;
+        border-radius: 16px;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+      }
+      p {
+        font-size: 0.95rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+        min-height: 100dvh;
+      }
+      .card {
+        padding: 16px 12px;
+        border-radius: 12px;
+      }
+      h1 {
+        font-size: 1.25rem;
+        margin-bottom: 10px;
+      }
+      p {
+        font-size: 0.9rem;
+      }
+    }
   </style>
 </head>
 <body>
