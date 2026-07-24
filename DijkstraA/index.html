@@ -8,13 +8,17 @@
 <style>
   :root{
     --bg:#0E1116; --panel:#171B22; --panel2:#1E242D; --line:#2A313C;
-    --text:#E7ECF3; --muted:#96A0AE; --accent:#378ADD;
+    --text:#E7ECF3; --muted:#B3BECC; --accent:#378ADD; --edge-cost:#FBBF24;
     --start:#E23B3B; --goal:#22C08A; --open:#12315E; --closed:#8FC2F5; --path:#F2913B; --cur:#B0D8FF;
     --f:#5B3F9E; --fg:#B255C4; --fw:#7B6FE8; --fh:#EC4E9E;
   }
   body.light{
-    --bg:#F5F7FA; --panel:#FFFFFF; --panel2:#EEF1F5; --line:#D8DEE6;
-    --text:#1C2430; --muted:#5B6675; --accent:#2E7BD6;
+    color-scheme:light;
+    --bg:#EEF4FA; --bg-end:#DCE8F5; --panel:#FFFFFF; --panel2:#F1F5F9; --line:#CBD5E1;
+    --text:#172033; --muted:#475569; --accent:#1769B0; --accent-2:#5B55C9; --edge-cost:#A84A08;
+    --shell:rgba(255,255,255,0.94); --soft-bg:#F8FAFC;
+    --control-bg:rgba(255,255,255,0.72); --control-hover:#E7EEF7;
+    --control-border:#B8C5D4; --shadow:rgba(30,64,110,0.16);
     --start:#D63333; --goal:#12A66F; --open:#123A6B; --closed:#A9CEF5; --path:#E07E1F; --cur:#2E7BD6;
     --f:#4C3491; --fg:#A63FB8; --fw:#6355D6; --fh:#D6318A;
   }
@@ -25,19 +29,27 @@
     --bg:#0f172a;
     --panel:#111827;
     --text:#f8fafc;
-    --muted:#94a3b8;
+    --muted:#B3BECC;
+    --edge-cost:#FBBF24;
     --accent:#38bdf8;
     --accent-2:#818cf8;
     --line:rgba(255,255,255,0.12);
+    --bg-end:#1e293b;
+    --shell:rgba(17,24,39,0.9);
+    --soft-bg:rgba(15,23,42,0.7);
+    --control-bg:rgba(255,255,255,0.04);
+    --control-hover:rgba(255,255,255,0.08);
+    --control-border:rgba(255,255,255,0.2);
+    --shadow:rgba(0,0,0,0.25);
   }
-  body{margin:0; min-height:100vh; font-family:Arial, Helvetica, sans-serif; background:linear-gradient(135deg, var(--bg), #1e293b); color:var(--text); display:grid; place-items:center; padding:24px; overflow:auto;}
+  body{margin:0; min-height:100vh; font-family:Arial, Helvetica, sans-serif; background:linear-gradient(135deg, var(--bg), var(--bg-end)); color:var(--text); display:grid; place-items:center; padding:24px; overflow:auto;}
   .page-shell{
     width:min(1280px, 100%);
-    background:rgba(17,24,39,0.9);
-    border:1px solid rgba(255,255,255,0.12);
+    background:var(--shell);
+    border:1px solid var(--line);
     border-radius:24px;
     padding:28px;
-    box-shadow:0 20px 45px rgba(0,0,0,0.25);
+    box-shadow:0 20px 45px var(--shadow);
     display:flex;
     flex-direction:column;
     gap:16px;
@@ -47,24 +59,24 @@
   h1{font-size:22px; font-weight:600; letter-spacing:-0.02em; margin:0;}
   .formula{font-size:19px; font-variant-numeric:tabular-nums; color:var(--muted);}
   .formula b{color:var(--accent); font-weight:600;}
-  .formula .g{color:#c084fc; font-weight:600;} .formula .w{color:#f472b6; font-weight:600;} .formula .h{color:#fb923c; font-weight:600;}
+  .formula .g{color:var(--fg); font-weight:600;} .formula .w{color:var(--fw); font-weight:600;} .formula .h{color:var(--fh); font-weight:600;}
   .button{display:inline-flex; align-items:center; justify-content:center; text-decoration:none; padding:10px 16px; border-radius:999px; font-weight:700; background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:white; transition:transform 0.2s ease, box-shadow 0.2s ease; border:0; cursor:pointer;}
   .button:hover{transform:translateY(-2px);}
-  .button.secondary{background:transparent; border:1px solid rgba(255,255,255,0.2); color:var(--text);}
+  .button.secondary{background:transparent; border:1px solid var(--control-border); color:var(--text);}
 
   .controls{display:flex; flex-wrap:wrap; align-items:center; gap:12px;}
-  button{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,0.2); border-radius:999px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:.15s;}
-  button:hover{background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.25);}
+  button{background:transparent; color:var(--text); border:1px solid var(--control-border); border-radius:999px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer; transition:.15s;}
+  button:hover{background:var(--control-hover); border-color:var(--accent);}
   button:active{transform:scale(.97);}
   button.primary{background:linear-gradient(90deg, var(--accent), var(--accent-2)); border-color:transparent; color:#fff; min-width:118px;}
   button.primary:hover{filter:brightness(1.05);}
-  .speed{display:inline-flex; align-items:center; border:1px solid rgba(255,255,255,0.2); border-radius:999px; overflow:hidden; background:rgba(255,255,255,0.04);}
+  .speed{display:inline-flex; align-items:center; border:1px solid var(--control-border); border-radius:999px; overflow:hidden; background:var(--control-bg);}
   .speed .lbl{font-size:12px; color:var(--muted); padding:0 10px 0 12px;}
-  .speed button{border:none; border-radius:0; border-left:1px solid rgba(255,255,255,0.12); padding:9px 13px; font-variant-numeric:tabular-nums;}
+  .speed button{border:none; border-radius:0; border-left:1px solid var(--line); padding:9px 13px; font-variant-numeric:tabular-nums;}
   .speed button:first-of-type{border-left:0;}
   .speed button.on{background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#fff;}
-  .verdict{margin-left:auto; font-size:14px; color:var(--muted); background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:8px 15px; max-width:520px;}
-  .verdict b{color:#34d399; font-weight:600;}
+  .verdict{margin-left:auto; font-size:14px; color:var(--muted); background:var(--soft-bg); border:1px solid var(--line); border-radius:12px; padding:8px 15px; max-width:520px;}
+  .verdict b{color:var(--goal); font-weight:600;}
 
   main{flex:1; min-height:0; display:flex; gap:16px;}
   .col{flex:1; min-width:0; display:flex; flex-direction:column; gap:9px;}
@@ -80,8 +92,11 @@
   canvas{display:block; width:100%; height:100%;}
 
   footer{flex:none; display:flex; flex-wrap:wrap; gap:8px 22px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:11px 16px; align-items:center;}
-  .item{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted);}
+  .item{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted); line-height:1.45;}
   .item b{color:var(--text); font-weight:600;}
+  .item b.c-edge{color:var(--edge-cost);}
+  .item b.c-g{color:var(--fg);}
+  .item b.c-h{color:var(--fh);}
   .dot{width:11px; height:11px; border-radius:50%; flex:none;}
   .sep{width:1px; height:15px; background:var(--line);}
 
@@ -309,6 +324,7 @@
   <!-- Mobile Tab Navigation -->
   <div class="mobile-tabs" id="mobileTabs" style="display:none;">
     <button class="active" data-tab="dijkstra">Dijkstra</button>
+    <button data-tab="dijkstra-rev">↔ Rev</button>
     <button data-tab="astar">A*</button>
   </div>
 
@@ -334,18 +350,17 @@
     </div>
   </main>
 
-    <footer>
-      <span class="item"><span class="dot" style="background:var(--start)"></span><b>Start</b></span>
-      <span class="item"><span class="dot" style="background:var(--goal)"></span><b>Goal</b></span>
-      <span class="item"><span class="dot" style="background:var(--open)"></span><b>Frontier (open)</b></span>
-      <span class="item"><span class="dot" style="background:var(--closed)"></span><b>Visited (closed)</b></span>
-      <span class="item"><span class="dot" style="background:var(--path)"></span><b>Path</b></span>
-      <div class="sep"></div>
-      <span class="item">numbers on edges = <b>edge cost</b></span>
-      <span class="item"><b>g(n)</b> cost start→n</span>
-      <span class="item"><b>h(n)</b> straight-line estimate n→goal</span>
-    </footer>
-  </main>
+  <footer>
+    <span class="item"><span class="dot" style="background:var(--start)"></span><b>Start</b></span>
+    <span class="item"><span class="dot" style="background:var(--goal)"></span><b>Goal</b></span>
+    <span class="item"><span class="dot" style="background:var(--open)"></span><b>Frontier (open)</b></span>
+    <span class="item"><span class="dot" style="background:var(--closed)"></span><b>Visited (closed)</b></span>
+    <span class="item"><span class="dot" style="background:var(--path)"></span><b>Path</b></span>
+    <div class="sep"></div>
+    <span class="item">numbers on edges = <b class="c-edge">edge cost</b></span>
+    <span class="item"><b class="c-g">g(n)</b> cost start→n</span>
+    <span class="item"><b class="c-h">h(n)</b> straight-line estimate n→goal</span>
+  </footer>
 
 <script>
 (function(){
