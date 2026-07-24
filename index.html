@@ -125,6 +125,112 @@
       margin-top: 34px;
       justify-content: center;
     }
+    .algorithm-tree {
+      width: min(600px, 100%);
+      margin-top: 34px;
+      margin-right: auto;
+      margin-left: auto;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 54px;
+      justify-items: stretch;
+    }
+    .algorithm-node {
+      display: flex;
+      justify-content: center;
+    }
+    .algorithm-node.root,
+    .algorithm-node.brsc {
+      grid-column: 1 / -1;
+    }
+    .algorithm-node .button {
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      max-width: 270px;
+      padding: 13px 15px;
+    }
+    .algorithm-node small {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .tree-down {
+      grid-column: 1 / -1;
+      width: 2px;
+      height: 34px;
+      margin: 0 auto;
+      background: var(--muted);
+      position: relative;
+    }
+    .tree-down::after,
+    .blrsc-down::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -1px;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: translateX(-50%) rotate(45deg);
+    }
+    .tree-branches {
+      grid-column: 1 / -1;
+      height: 42px;
+      margin: 24px 25% 0;
+      border-top: 2px solid var(--muted);
+      border-right: 2px solid var(--muted);
+      border-left: 2px solid var(--muted);
+      position: relative;
+    }
+    .tree-branches::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 100%;
+      width: 2px;
+      height: 24px;
+      background: var(--muted);
+      transform: translateX(-50%);
+    }
+    .algorithm-node.arsc {
+      grid-column: 1;
+    }
+    .algorithm-node.blrsc {
+      grid-column: 2;
+    }
+    .algorithm-node.arsc,
+    .algorithm-node.blrsc {
+      position: relative;
+    }
+    .algorithm-node.arsc::before,
+    .algorithm-node.blrsc::before {
+      content: "";
+      position: absolute;
+      top: -7px;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: translateX(-50%) rotate(45deg);
+    }
+    .blrsc-down {
+      grid-column: 2;
+      width: 2px;
+      height: 34px;
+      margin: 0 auto;
+      background: var(--muted);
+      position: relative;
+    }
+    .algorithm-node.bc-irnn {
+      grid-column: 2;
+    }
+    .resource-actions {
+      margin-top: 18px;
+    }
     .button.powerpoint {
       background: transparent;
       border: 1px solid var(--control-border);
@@ -194,6 +300,18 @@
         flex-direction: column;
         gap: 10px;
       }
+      .algorithm-tree {
+        column-gap: 18px;
+      }
+      .algorithm-node .button {
+        width: 100%;
+        padding-right: 8px;
+        padding-left: 8px;
+      }
+      .tree-branches {
+        margin-right: 25%;
+        margin-left: 25%;
+      }
       a.button {
         width: 100%;
         text-align: center;
@@ -236,9 +354,27 @@
     <h1>Concepts and Algorithms for <span>Multi-Criteria Route Optimization.</span></h1>
     <p>Explore and compare skyline approaches for route planning: from graph search with Dijkstra and A* to compact sets of linearly optimal paths in bicriteria networks.</p>
 
-    <div class="actions">
-      <a class="button" href="/DijkstraA/">Dijkstra &amp; A* Search&nbsp; →</a>
-      <a class="button" href="/Linear/">Linear Path Skyline&nbsp; →</a>
+    <div class="algorithm-tree" aria-label="Abhängigkeiten der Algorithmen">
+      <div class="algorithm-node root">
+        <a class="button" href="/DijkstraA/">Dijkstra &amp; A*<small>Graph-search foundation</small></a>
+      </div>
+      <div class="tree-down" aria-hidden="true"></div>
+      <div class="algorithm-node brsc">
+        <a class="button" href="/BRSC/">BRSC<small>Basic route skyline</small></a>
+      </div>
+      <div class="tree-branches" aria-hidden="true"></div>
+      <div class="algorithm-node arsc">
+        <a class="button" href="/ARSC/">ARSC<small>Advanced pruning</small></a>
+      </div>
+      <div class="algorithm-node blrsc">
+        <a class="button" href="/Linear/">BLRSC<small>Linear skyline</small></a>
+      </div>
+      <div class="blrsc-down" aria-hidden="true"></div>
+      <div class="algorithm-node bc-irnn">
+        <a class="button" href="/BC-IRNN/">BC-IRNN<small>POI route extension</small></a>
+      </div>
+    </div>
+    <div class="actions resource-actions">
       <a class="button secondary" href="/Datascience_Projekt%20(13).pdf" download="Current_Paper.pdf">Download paper</a>
       <a class="button powerpoint" href="https://1drv.ms/p/c/ce9f3197ab2af297/IQBs65Z07sb7QoUPpoOQToKIAXlUGvcXHBHZ4poMEWfKeKE">View presentation</a>
     </div>
