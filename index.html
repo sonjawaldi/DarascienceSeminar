@@ -9,18 +9,39 @@
     :root {
       color-scheme: dark;
       --bg: #0f172a;
+      --bg-end: #1e293b;
       --panel: #111827;
+      --panel-alpha: rgba(17, 24, 39, 0.9);
       --text: #f8fafc;
       --muted: #94a3b8;
       --accent: #38bdf8;
       --accent-2: #818cf8;
+      --border: rgba(255,255,255,0.12);
+      --control-border: rgba(255,255,255,0.2);
+      --control-hover: rgba(255,255,255,0.08);
+      --shadow: rgba(0,0,0,0.25);
+    }
+    body.light {
+      color-scheme: light;
+      --bg: #eef4fa;
+      --bg-end: #dce8f5;
+      --panel: #ffffff;
+      --panel-alpha: rgba(255,255,255,0.94);
+      --text: #172033;
+      --muted: #475569;
+      --accent: #1769b0;
+      --accent-2: #5b55c9;
+      --border: rgba(30,64,110,0.14);
+      --control-border: #b8c5d4;
+      --control-hover: #e7eef7;
+      --shadow: rgba(30,64,110,0.16);
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, var(--bg), #1e293b);
+      background: linear-gradient(135deg, var(--bg), var(--bg-end));
       color: var(--text);
       display: grid;
       place-items: center;
@@ -28,11 +49,32 @@
     }
     .card {
       width: min(760px, 100%);
-      background: rgba(17, 24, 39, 0.9);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: var(--panel-alpha);
+      border: 1px solid var(--border);
       border-radius: 24px;
       padding: 32px;
-      box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+      box-shadow: 0 20px 45px var(--shadow);
+    }
+    .card-header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid var(--control-border);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .theme-toggle:hover {
+      background: var(--control-hover);
     }
     h1 { margin: 0 0 12px; font-size: 2rem; }
     p { color: var(--muted); line-height: 1.6; }
@@ -41,6 +83,7 @@
     .button.powerpoint:hover { transform: translateY(-2px); filter: brightness(1.05); }
     .button.powerpoint.secondary { background: transparent; border-color: #f18f01; color: white; }
     .button.powerpoint.secondary:hover { background: rgba(241, 143, 1, 0.15); }
+    body.light .button.powerpoint.secondary { color: #a84b00; }
     .language-toggle {
       margin-top: 18px;
       display: flex;
@@ -50,7 +93,7 @@
       color: var(--muted);
     }
     .language-toggle button {
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid var(--control-border);
       background: transparent;
       color: var(--text);
       border-radius: 999px;
@@ -59,7 +102,7 @@
       font-weight: 700;
     }
     .language-toggle button:hover {
-      background: rgba(255,255,255,0.08);
+      background: var(--control-hover);
     }
     a.button {
       display: inline-block;
@@ -74,7 +117,7 @@
     a.button:hover { transform: translateY(-2px); }
     a.button.secondary {
       background: transparent;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid var(--control-border);
       color: var(--text);
     }
 
@@ -131,14 +174,38 @@
 </head>
 <body>
   <main class="card">
+    <div class="card-header">
+      <button class="theme-toggle" id="theme" type="button" aria-label="Light Mode aktivieren" title="Light Mode aktivieren">&#9728;&#65039;</button>
+    </div>
     <h1>Welcome to the Datascience Seminar</h1>
     <p>This demo provides an interactive introduction to search algorithms.</p>
 
     <div class="actions">
       <a class="button" href="/DijkstraA/">Go to the Dijkstra/A* example</a>
+      <a class="button secondary" href="/Datascience_Projekt%20(13).pdf" download="Current_Paper.pdf">Download current paper</a>
       <a class="button powerpoint" href="https://1drv.ms/p/c/ce9f3197ab2af297/IQBs65Z07sb7QoUPpoOQToKIAXlUGvcXHBHZ4poMEWfKeKE">Open PowerPoint</a>
       <a class="button powerpoint secondary" href="https://1drv.ms/p/c/ce9f3197ab2af297/IQBs65Z07sb7QoUPpoOQToKIAXlUGvcXHBHZ4poMEWfKeKE" target="_blank" rel="noopener noreferrer">Open PowerPoint in new tab</a>
     </div>
   </main>
+  <script>
+    (function () {
+      const button = document.getElementById('theme');
+
+      function setTheme(light) {
+        document.body.classList.toggle('light', light);
+        button.textContent = light ? '\uD83C\uDF19' : '\u2600\uFE0F';
+        const nextTheme = light ? 'Dark Mode' : 'Light Mode';
+        button.setAttribute('aria-label', nextTheme + ' aktivieren');
+        button.title = nextTheme + ' aktivieren';
+      }
+
+      setTheme(localStorage.getItem('theme') === 'light');
+      button.addEventListener('click', function () {
+        const light = !document.body.classList.contains('light');
+        setTheme(light);
+        localStorage.setItem('theme', light ? 'light' : 'dark');
+      });
+    }());
+  </script>
 </body>
 </html>

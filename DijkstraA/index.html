@@ -55,6 +55,7 @@
     gap:16px;
   }
   .page-header{display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;}
+  .header-actions{display:flex; align-items:center; gap:8px;}
   .page-title-wrap{display:flex; flex-direction:column; gap:8px;}
   h1{font-size:22px; font-weight:600; letter-spacing:-0.02em; margin:0;}
   .formula{font-size:19px; font-variant-numeric:tabular-nums; color:var(--muted);}
@@ -70,6 +71,7 @@
   button:active{transform:scale(.97);}
   button.primary{background:linear-gradient(90deg, var(--accent), var(--accent-2)); border-color:transparent; color:#fff; min-width:118px;}
   button.primary:hover{filter:brightness(1.05);}
+  #theme{width:42px; height:42px; padding:0; display:inline-grid; place-items:center; font-size:20px;}
   .speed{display:inline-flex; align-items:center; border:1px solid var(--control-border); border-radius:999px; overflow:hidden; background:var(--control-bg);}
   .speed .lbl{font-size:12px; color:var(--muted); padding:0 10px 0 12px;}
   .speed button{border:none; border-radius:0; border-left:1px solid var(--line); padding:9px 13px; font-variant-numeric:tabular-nums;}
@@ -92,6 +94,7 @@
   canvas{display:block; width:100%; height:100%;}
 
   footer{flex:none; display:flex; flex-wrap:wrap; gap:8px 22px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:11px 16px; align-items:center;}
+  .legend-title{display:none;}
   .item{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted); line-height:1.45;}
   .item b{color:var(--text); font-weight:600;}
   .item b.c-edge{color:var(--edge-cost);}
@@ -102,26 +105,44 @@
 
   /* ========== MOBILE RESPONSIVE ========== */
   @media (max-width: 1024px) {
-    body { padding: 12px 16px; }
+    body {
+      display: block;
+      min-height: 100dvh;
+      padding: 12px 16px;
+    }
+    .page-shell {
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+    }
     h1 { font-size: 18px; }
     .formula { font-size: 16px; }
-    header { flex-direction: column; align-items: flex-start; }
   }
 
   @media (max-width: 768px) {
     body {
       padding: 10px 12px;
-      gap: 10px;
+    }
+    .page-shell {
+      padding: 16px;
+      border-radius: 16px;
+      gap: 14px;
+    }
+    .page-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .header-actions {
+      justify-content: space-between;
     }
     h1 {
-      font-size: 16px;
-      margin-bottom: 6px;
+      font-size: 18px;
+      line-height: 1.25;
     }
     .formula {
       font-size: 14px;
-      order: 3;
       width: 100%;
-      margin-top: 8px;
     }
     .controls {
       gap: 8px;
@@ -149,10 +170,32 @@
     main {
       flex-direction: column;
       gap: 12px;
+      width: 100%;
+    }
+    .mobile-tabs {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+    }
+    .mobile-tabs button {
+      flex: 1;
+      padding: 9px 8px;
+      border-radius: 8px;
+      background: var(--panel2);
+    }
+    .mobile-tabs button.active {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-color: transparent;
+      color: #fff;
     }
     .col {
-      gap: 6px;
+      display: none;
+      min-width: 0;
     }
+    .col.visible {
+      display: flex;
+    }
+    .col { gap: 6px; }
     .col-head {
       flex-wrap: wrap;
       gap: 8px;
@@ -184,34 +227,67 @@
       border-radius: 8px;
     }
     footer {
-      gap: 6px 16px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      flex-direction: column;
-      align-items: flex-start;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--soft-bg);
     }
+    .legend-title {
+      display: block;
+      grid-column: 1 / -1;
+      margin-bottom: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .legend-state {
+      min-width: 0;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    .legend-note {
+      grid-column: 1 / -1;
+      padding: 4px 2px 0;
+    }
+    .legend-note + .legend-note { padding-top: 0; }
     .item {
       font-size: 11px;
       gap: 5px;
     }
-    .dot { width: 9px; height: 9px; }
-    .sep { height: 12px; }
+    .dot {
+      width: 11px;
+      height: 11px;
+      box-shadow: 0 0 0 2px var(--panel), 0 0 0 3px var(--line);
+    }
+    .sep { display: none; }
   }
 
   @media (max-width: 480px) {
     body {
       padding: 8px;
-      gap: 8px;
       min-height: 100dvh;
     }
+    .page-shell {
+      padding: 12px;
+      border-radius: 12px;
+      gap: 12px;
+    }
     h1 {
-      font-size: 14px;
+      font-size: 17px;
       letter-spacing: 0;
     }
-    header {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 8px;
+    .page-header {
+      gap: 10px;
+    }
+    .header-actions .button {
+      min-height: 42px;
+      padding: 9px 16px;
     }
     .formula {
       font-size: 12px;
@@ -244,12 +320,7 @@
       gap: 10px;
       flex-direction: column;
     }
-    .mobile-tabs {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
+    .mobile-tabs { align-items: center; }
     .mobile-tabs button {
       flex: 1;
       min-width: 70px;
@@ -267,12 +338,6 @@
       border-color: var(--accent);
       color: white;
       font-weight: bold;
-    }
-    .col {
-      display: none;
-    }
-    .col.visible {
-      display: flex;
     }
     .col-head {
       gap: 6px;
@@ -292,12 +357,13 @@
       min-height: 250px;
     }
     footer {
-      gap: 4px 12px;
-      padding: 6px 10px;
-      font-size: 10px;
+      gap: 7px;
+      padding: 10px;
     }
-    .item { font-size: 10px; gap: 4px; }
-    .dot { width: 8px; height: 8px; }
+    .legend-state { padding: 8px; }
+    .item { font-size: 10.5px; gap: 7px; }
+    .legend-note { line-height: 1.35; }
+    .dot { width: 10px; height: 10px; }
   }
 
 </style>
@@ -309,14 +375,16 @@
         <h1>A* Search with Heuristics — Dijkstra vs. A*</h1>
         <div class="formula"><b>f(n)</b> = <span class="g">g(n)</span> + <span class="w">w</span> · <span class="h">h(n)</span></div>
       </div>
-      <a class="button secondary" href="/">Home</a>
+      <div class="header-actions">
+        <a class="button secondary" href="/">Home</a>
+        <button id="theme" type="button" aria-label="Light Mode aktivieren" title="Light Mode aktivieren">&#9728;&#65039;</button>
+      </div>
     </header>
 
     <div class="controls">
       <button class="primary" id="play">▶ Play</button>
       <button id="step">Step →</button>
       <button id="reset">↻ Reset</button>
-      <button id="theme">☀ Light</button>
       <div class="speed"><span class="lbl">Speed</span><button data-sp="0.5">0.5×</button><button data-sp="1" class="on">1×</button><button data-sp="2">2×</button></div>
       <div class="verdict" id="verdict">Both searches find the same optimal path — watch how many nodes each one explores.</div>
     </div>
@@ -324,7 +392,6 @@
   <!-- Mobile Tab Navigation -->
   <div class="mobile-tabs" id="mobileTabs" style="display:none;">
     <button class="active" data-tab="dijkstra">Dijkstra</button>
-    <button data-tab="dijkstra-rev">↔ Rev</button>
     <button data-tab="astar">A*</button>
   </div>
 
@@ -350,16 +417,17 @@
     </div>
   </main>
 
-  <footer>
-    <span class="item"><span class="dot" style="background:var(--start)"></span><b>Start</b></span>
-    <span class="item"><span class="dot" style="background:var(--goal)"></span><b>Goal</b></span>
-    <span class="item"><span class="dot" style="background:var(--open)"></span><b>Frontier (open)</b></span>
-    <span class="item"><span class="dot" style="background:var(--closed)"></span><b>Visited (closed)</b></span>
-    <span class="item"><span class="dot" style="background:var(--path)"></span><b>Path</b></span>
+  <footer aria-label="Legend">
+    <span class="legend-title">Legend</span>
+    <span class="item legend-state"><span class="dot" style="background:var(--start)"></span><b>Start</b></span>
+    <span class="item legend-state"><span class="dot" style="background:var(--goal)"></span><b>Goal</b></span>
+    <span class="item legend-state"><span class="dot" style="background:var(--open)"></span><b>Frontier (open)</b></span>
+    <span class="item legend-state"><span class="dot" style="background:var(--closed)"></span><b>Visited (closed)</b></span>
+    <span class="item legend-state"><span class="dot" style="background:var(--path)"></span><b>Path</b></span>
     <div class="sep"></div>
-    <span class="item">numbers on edges = <b class="c-edge">edge cost</b></span>
-    <span class="item"><b class="c-g">g(n)</b> cost start→n</span>
-    <span class="item"><b class="c-h">h(n)</b> straight-line estimate n→goal</span>
+    <span class="item legend-note">numbers on edges = <b class="c-edge">edge cost</b></span>
+    <span class="item legend-note"><b class="c-g">g(n)</b> cost start→n</span>
+    <span class="item legend-note"><b class="c-h">h(n)</b> straight-line estimate n→goal</span>
   </footer>
 
 <script>
@@ -396,7 +464,8 @@
   let W=0,H=0;
   function layout(){
     const dpr=window.devicePixelRatio||1;
-    const wrap=panels[0].cv.parentElement;
+    const visiblePanel=panels.find(p=>p.cv.parentElement.offsetParent!==null) || panels[0];
+    const wrap=visiblePanel.cv.parentElement;
     const cssW=wrap.clientWidth, cssH=wrap.clientHeight;
     if(cssW<10||cssH<10) return;
     const mx=Math.max(40,cssW*0.07), my=Math.max(40,cssH*0.11);
@@ -497,11 +566,20 @@
   });
 
   const themeBtn=document.getElementById('theme');
-  themeBtn.onclick=()=>{
-    const light=document.body.classList.toggle('light');
+  function setTheme(light){
+    document.body.classList.toggle('light', light);
     C = light ? PAL.light : PAL.dark;
-    themeBtn.textContent = light ? '🌙 Dark' : '☀ Light';
+    themeBtn.textContent = light ? '\uD83C\uDF19' : '\u2600\uFE0F';
+    const nextTheme=light ? 'Dark Mode' : 'Light Mode';
+    themeBtn.setAttribute('aria-label', nextTheme+' aktivieren');
+    themeBtn.title=nextTheme+' aktivieren';
     panels.forEach(draw);
+  }
+  setTheme(localStorage.getItem('theme') === 'light');
+  themeBtn.onclick=()=>{
+    const light=!document.body.classList.contains('light');
+    setTheme(light);
+    localStorage.setItem('theme', light ? 'light' : 'dark');
   };
 
   const dirBtn=document.getElementById('dir-d'), nameD=document.getElementById('name-d');
@@ -527,7 +605,7 @@
   let currentTab = 'dijkstra';
   
   function isMobile() {
-    return window.innerWidth <= 480;
+    return window.innerWidth <= 768;
   }
   
   function showMobileTabs() {
@@ -535,6 +613,8 @@
       mobileTabs.style.display = 'flex';
     } else {
       mobileTabs.style.display = 'none';
+      document.getElementById('col-dijkstra').classList.add('visible');
+      document.getElementById('col-astar').classList.add('visible');
     }
   }
   
@@ -576,9 +656,13 @@
   });
   
   // Show/hide mobile tabs on resize
-  window.addEventListener('resize', showMobileTabs);
+  window.addEventListener('resize', () => {
+    showMobileTabs();
+    if (isMobile()) switchTab(currentTab);
+    else layout();
+  });
   showMobileTabs();
-  switchTab(currentTab);
+  if (isMobile()) switchTab(currentTab);
 
   layout(); resetAll();
 })();
