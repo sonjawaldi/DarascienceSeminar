@@ -273,7 +273,7 @@
     ctx.beginPath(); ctx.moveTo(PX(AXT),PY(0)); ctx.lineTo(PX(AXT)-9,PY(0)-5); ctx.lineTo(PX(AXT)-9,PY(0)+5); ctx.fill();
     ctx.beginPath(); ctx.moveTo(PX(0),PY(AXL)); ctx.lineTo(PX(0)-5,PY(AXL)+9); ctx.lineTo(PX(0)+5,PY(AXL)+9); ctx.fill();
     ctx.fillStyle=C.label; ctx.font='13px -apple-system,Segoe UI,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('Travel time →', PX(0)+8, PY(0)+9);
-    ctx.save(); ctx.translate(PX(0)-40, PY(0)); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillText('Distance →',0,0); ctx.restore();
+    ctx.save(); ctx.translate(PX(0)-9, PY(0)-8); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillText('Distance →',0,0); ctx.restore();
     ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.font='12px -apple-system,Segoe UI,sans-serif'; ctx.fillText('lower-left = better', PX(0)+8, PY(AXL)-2);
   }
   function skylineLine(){
