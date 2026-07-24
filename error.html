@@ -4,24 +4,44 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Seite nicht gefunden</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="stylesheet" href="/responsive.css" />
   <style>
     body {
+      --panel-alpha: rgba(31, 41, 55, 0.94);
+      --text: #f8fafc;
+      --accent: #38bdf8;
+      --border: rgba(255,255,255,0.12);
+      --control-border: rgba(255,255,255,0.2);
+      --control-hover: rgba(255,255,255,0.08);
+      --shadow: rgba(0,0,0,0.25);
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
       font-family: Arial, Helvetica, sans-serif;
       background: #111827;
       color: #f8fafc;
       padding: 24px;
     }
+    body.light {
+      --panel-alpha: rgba(255,255,255,0.94);
+      --text: #172033;
+      --accent: #1769b0;
+      --border: rgba(30,64,110,0.14);
+      --control-border: #b8c5d4;
+      --control-hover: #e7eef7;
+      --shadow: rgba(30,64,110,0.16);
+      background: #eef4fa;
+      color: var(--text);
+    }
     .card {
+      margin: auto 0;
       max-width: 560px;
       text-align: center;
-      background: #1f2937;
-      border-radius: 20px;
-      padding: 32px;
+      padding: 32px 0;
     }
     a { color: #7dd3fc; }
     
@@ -33,8 +53,7 @@
       }
       .card {
         max-width: 100%;
-        padding: 24px 16px;
-        border-radius: 16px;
+        padding: 24px 0;
       }
       h1 {
         font-size: 1.5rem;
@@ -51,8 +70,7 @@
         min-height: 100dvh;
       }
       .card {
-        padding: 16px 12px;
-        border-radius: 12px;
+        padding: 16px 0;
       }
       h1 {
         font-size: 1.25rem;
@@ -65,10 +83,37 @@
   </style>
 </head>
 <body>
+  <header class="site-header">
+    <a class="site-logo" href="/" aria-label="Datascience Seminar – Startseite">
+      <img src="/favicon.png" alt="" />
+      <span class="site-logo-text">Datascience<span>Seminar</span></span>
+    </a>
+    <button class="site-theme-toggle" id="theme" type="button" aria-label="Light Mode aktivieren" title="Light Mode aktivieren">&#9728;&#65039;</button>
+  </header>
   <main class="card">
     <h1>404 – Seite nicht gefunden</h1>
     <p>Die angeforderte Seite existiert nicht oder wurde verschoben.</p>
     <p><a href="/">Zur Startseite</a></p>
   </main>
+  <script>
+    (function () {
+      const button = document.getElementById('theme');
+
+      function setTheme(light) {
+        document.body.classList.toggle('light', light);
+        button.textContent = light ? '\uD83C\uDF19' : '\u2600\uFE0F';
+        const nextTheme = light ? 'Dark Mode' : 'Light Mode';
+        button.setAttribute('aria-label', nextTheme + ' aktivieren');
+        button.title = nextTheme + ' aktivieren';
+      }
+
+      setTheme(localStorage.getItem('theme') === 'light');
+      button.addEventListener('click', function () {
+        const light = !document.body.classList.contains('light');
+        setTheme(light);
+        localStorage.setItem('theme', light ? 'light' : 'dark');
+      });
+    }());
+  </script>
 </body>
 </html>
