@@ -49,20 +49,90 @@
       align-items: center;
       gap: 24px;
       padding: 24px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      filter: blur(110px);
+      opacity: 0.16;
+      pointer-events: none;
+      z-index: -1;
+    }
+    body::before {
+      top: -180px;
+      left: -140px;
+      background: var(--accent);
+    }
+    body::after {
+      right: -160px;
+      bottom: -220px;
+      background: var(--accent-2);
     }
     .card {
-      width: min(760px, 100%);
-      padding: 32px 0;
+      width: min(820px, 100%);
+      padding: 64px 0 80px;
+      text-align: center;
     }
     .card { margin: auto 0; }
-    h1 { margin: 0 0 12px; font-size: 2rem; }
-    p { color: var(--muted); line-height: 1.6; }
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; justify-content: center; }
-    .button.powerpoint { background: linear-gradient(90deg, #d24726, #f18f01); color: white; }
-    .button.powerpoint:hover { transform: translateY(-2px); filter: brightness(1.05); }
-    .button.powerpoint.secondary { background: transparent; border-color: #f18f01; color: white; }
-    .button.powerpoint.secondary:hover { background: rgba(241, 143, 1, 0.15); }
-    body.light .button.powerpoint.secondary { color: #a84b00; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 24px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+    h1 {
+      max-width: 760px;
+      margin: 0 auto 18px;
+      font-size: clamp(2.6rem, 7vw, 5.3rem);
+      line-height: 0.98;
+      letter-spacing: -0.06em;
+    }
+    h1 span {
+      color: transparent;
+      background: linear-gradient(100deg, var(--accent), var(--accent-2));
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+    p {
+      max-width: 610px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.7;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+      justify-content: center;
+    }
+    .button.powerpoint {
+      background: transparent;
+      border: 1px solid var(--control-border);
+      color: var(--text);
+    }
+    .button.powerpoint:hover {
+      background: var(--control-hover);
+    }
     .language-toggle {
       margin-top: 18px;
       display: flex;
@@ -84,16 +154,21 @@
       background: var(--control-hover);
     }
     a.button {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
       text-decoration: none;
-      padding: 12px 18px;
-      border-radius: 999px;
+      padding: 13px 20px;
+      border-radius: 13px;
       font-weight: 700;
       background: linear-gradient(90deg, var(--accent), var(--accent-2));
       color: white;
-      transition: transform 0.2s ease;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 24px rgba(56, 189, 248, 0.14);
+      transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease;
     }
-    a.button:hover { transform: translateY(-2px); }
+    a.button:hover { transform: translateY(-2px); filter: brightness(1.06); }
     a.button.secondary {
       background: transparent;
       border: 1px solid var(--control-border);
@@ -107,10 +182,10 @@
       }
       .card {
         width: 100%;
-        padding: 24px 0;
+        padding: 48px 0 64px;
       }
       h1 {
-        font-size: 1.5rem;
+        letter-spacing: -0.045em;
       }
       p {
         font-size: 0.95rem;
@@ -133,11 +208,10 @@
         min-height: 100dvh;
       }
       .card {
-        padding: 16px 0;
+        padding: 40px 0 48px;
       }
       h1 {
-        font-size: 1.25rem;
-        margin: 0 0 8px;
+        margin-bottom: 16px;
       }
       p {
         font-size: 0.9rem;
@@ -158,14 +232,14 @@
     <button class="site-theme-toggle" id="theme" type="button" aria-label="Light Mode aktivieren" title="Light Mode aktivieren">&#9728;&#65039;</button>
   </header>
   <main class="card">
-    <h1>Welcome to the Datascience Seminar</h1>
-    <p>This demo provides an interactive introduction to search algorithms.</p>
+    <div class="eyebrow">Interactive learning</div>
+    <h1>Explore search algorithms <span>visually.</span></h1>
+    <p>Compare Dijkstra and A* step by step, understand their decisions and see how heuristics make pathfinding more efficient.</p>
 
     <div class="actions">
-      <a class="button" href="/DijkstraA/">Go to the Dijkstra/A* example</a>
-      <a class="button secondary" href="/Datascience_Projekt%20(13).pdf" download="Current_Paper.pdf">Download current paper</a>
-      <a class="button powerpoint" href="https://1drv.ms/p/c/ce9f3197ab2af297/IQBs65Z07sb7QoUPpoOQToKIAXlUGvcXHBHZ4poMEWfKeKE">Open PowerPoint</a>
-      <a class="button powerpoint secondary" href="https://1drv.ms/p/c/ce9f3197ab2af297/IQBs65Z07sb7QoUPpoOQToKIAXlUGvcXHBHZ4poMEWfKeKE" target="_blank" rel="noopener noreferrer">Open PowerPoint in new tab</a>
+      <a class="button" href="/DijkstraA/">Start visualization&nbsp; →</a>
+      <a class="button secondary" href="/Datascience_Projekt%20(13).pdf" download="Current_Paper.pdf">Download paper</a>
+      <a class="button powerpoint" href="https://1drv.ms/p/c/ce9f3197ab2af297/IQBs65Z07sb7QoUPpoOQToKIAXlUGvcXHBHZ4poMEWfKeKE">View presentation</a>
     </div>
   </main>
   <script>
