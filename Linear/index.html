@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BLRSC — Skyline Path Optimization (SJSK14)</title>
+<title>Linear Path Skyline Computation in Bicriteria Networks</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="stylesheet" href="/responsive.css">
 <style>
@@ -130,39 +130,39 @@
   <div class="page-shell">
   <header class="page-header">
     <div class="page-title-wrap">
-      <h1>BLRSC — Linear Skyline Pruning</h1>
-      <div class="formula"><b>p(n)</b> = travel time + distance ≤ bound</div>
+      <h1>Linear Path Skyline Computation in Bicriteria Networks</h1>
+      <div class="formula"><b>BLRSC</b> — Bidirectional Linear Route Skyline Computation</div>
     </div>
   </header>
 
   <div class="controls">
     <div class="range-wrap">
-      <span class="stepnum">Bound line</span>
+      <span class="stepnum">Linear bound</span>
       <span class="stepnum">tight</span>
       <input type="range" id="bound" min="29" max="38" step="1" value="37">
       <span class="stepnum">loose</span>
     </div>
-    <div class="verdict" id="prunecount">routes left: 9 / 9</div>
+    <div class="verdict" id="prunecount">candidate paths: 9 / 9</div>
   </div>
 
   <main>
     <div class="col">
-      <div class="col-head"><span class="name">Road network <span class="tag">surviving routes</span></span><span class="cnt"><b id="routecount-l">9</b> visible</span></div>
+      <div class="col-head"><span class="name">Bicriteria network <span class="tag">candidate paths</span></span><span class="cnt"><b id="routecount-l">9</b> visible</span></div>
       <div class="canvas-wrap"><canvas id="map"></canvas></div>
-      <div class="algorithm-status">Pruned routes disappear from the network.</div>
+      <div class="algorithm-status">Linearly dominated paths are removed from the candidate set.</div>
     </div>
     <div class="col">
       <div class="col-head"><span class="name">Criteria space <span class="tag">time × distance</span></span><span class="cnt"><b id="boundvalue">37</b> bound</span></div>
       <div class="canvas-wrap"><canvas id="plot"></canvas></div>
-      <div class="algorithm-status">Move the line toward the origin to tighten the bound.</div>
+      <div class="algorithm-status">Move the linear bound toward the origin to reduce the result set.</div>
     </div>
   </main>
 
   <footer aria-label="Legend">
     <span class="item"><span class="dot" style="background:var(--start)"></span><b>Start</b></span>
     <span class="item"><span class="dot" style="background:var(--goal)"></span><b>Goal</b></span>
-    <span class="item"><span class="dot" style="background:var(--keep)"></span><b>Surviving route</b></span>
-    <span class="item"><span class="dot" style="background:var(--prune)"></span><b>Pruned route</b></span>
+    <span class="item"><span class="dot" style="background:var(--keep)"></span><b>Candidate path</b></span>
+    <span class="item"><span class="dot" style="background:var(--prune)"></span><b>Pruned path</b></span>
     <div class="narr" id="narr"></div>
   </footer>
   </div>
@@ -323,7 +323,7 @@
     }
     // label the bound line
     ctx.fillStyle=C.keep; ctx.font='600 13px -apple-system,Segoe UI,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='bottom';
-    ctx.fillText('p(n) = time + len = '+k, x1+8, y1+16);
+    ctx.fillText('p(n) = time + distance = '+k, x1+8, y1+16);
   }
 
   function draw(){ AXT=26; AXL=26; drawMapPrune(); drawPlotPrune(); }
@@ -333,11 +333,11 @@
   const routeCount=document.getElementById('routecount-l'), boundValue=document.getElementById('boundvalue');
   function narrPrune(){
     const n=prunedRoutes().size, left=paths.length-n;
-    pruneCount.textContent='routes left: '+left+' / '+paths.length;
+    pruneCount.textContent='candidate paths: '+left+' / '+paths.length;
     pruneCount.style.color = (left<=2) ? 'var(--keep)' : 'var(--prune)';
     routeCount.textContent=left;
     boundValue.textContent=kbound;
-    narrEl.innerHTML='Each route is a point at its cost (time, distance). The linear pruning line <b>p(n) = time + len = k</b> prunes every route with <b>p(n) &gt; k</b> (above-right) — it vanishes from the graph. Slide toward the origin (smaller k) to prune more, down to the 2 best routes.';
+    narrEl.innerHTML='Each path is represented by its two criteria: travel time and distance. BLRSC retains paths that are optimal for a linear weighting of these criteria. This simplified equal-weight example uses <b>p(n) = time + distance</b>; paths above the bound are pruned. Move the bound toward the origin to obtain a smaller set of linearly optimal alternatives.';
   }
   boundSlider.oninput=()=>{ kbound=parseFloat(boundSlider.value); narrPrune(); draw(); };
 
