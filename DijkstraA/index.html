@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A* Search with Heuristics</title>
+<style>
+  :root{
+    --bg:#0E1116; --panel:#171B22; --panel2:#1E242D; --line:#2A313C;
+    --text:#E7ECF3; --muted:#96A0AE; --accent:#378ADD;
+    --start:#E23B3B; --goal:#22C08A; --open:#12315E; --closed:#8FC2F5; --path:#F2913B; --cur:#B0D8FF;
+    --f:#5B3F9E; --fg:#B255C4; --fw:#7B6FE8; --fh:#EC4E9E;
+  }
+  body.light{
+    --bg:#F5F7FA; --panel:#FFFFFF; --panel2:#EEF1F5; --line:#D8DEE6;
+    --text:#1C2430; --muted:#5B6675; --accent:#2E7BD6;
+    --start:#D63333; --goal:#12A66F; --open:#123A6B; --closed:#A9CEF5; --path:#E07E1F; --cur:#2E7BD6;
+    --f:#4C3491; --fg:#A63FB8; --fw:#6355D6; --fh:#D6318A;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; overflow:hidden; display:flex; flex-direction:column; padding:16px 22px; gap:12px;}
+
+  header{display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+  h1{font-size:22px; font-weight:600; letter-spacing:-0.02em;}
+  .formula{font-size:19px; font-variant-numeric:tabular-nums;}
+  .formula b{color:var(--f); font-weight:600;}
+  .formula .g{color:var(--fg); font-weight:600;} .formula .w{color:var(--fw); font-weight:600;} .formula .h{color:var(--fh); font-weight:600;}
+
+  .controls{display:flex; flex-wrap:wrap; align-items:center; gap:12px;}
+  button{background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:9px; padding:9px 15px; font-size:14px; font-weight:500; cursor:pointer; transition:.15s;}
+  button:hover{background:#28303B; border-color:#3A4350;}
+  button:active{transform:scale(.97);}
+  button.primary{background:var(--accent); border-color:var(--accent); color:#fff; min-width:118px;}
+  button.primary:hover{background:#2E78C4;}
+  .speed{display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:9px; overflow:hidden;}
+  .speed .lbl{font-size:12px; color:var(--muted); padding:0 10px 0 12px;}
+  .speed button{border:none; border-radius:0; border-left:1px solid var(--line); padding:9px 13px; font-variant-numeric:tabular-nums;}
+  .speed button.on{background:var(--accent); color:#fff;}
+  .verdict{margin-left:auto; font-size:14px; color:var(--muted); background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:8px 15px; max-width:520px;}
+  .verdict b{color:var(--goal); font-weight:600;}
+
+  main{flex:1; min-height:0; display:flex; gap:16px;}
+  .col{flex:1; min-width:0; display:flex; flex-direction:column; gap:9px;}
+  .col-head{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .col-head .name{font-size:16px; font-weight:600; display:flex; align-items:center; gap:9px;}
+  .tag{font-size:12px; font-weight:600; color:var(--text); background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:2px 9px; font-variant-numeric:tabular-nums;}
+  .c-f{color:var(--f);} .c-g{color:var(--fg);} .c-w{color:var(--fw);} .c-h{color:var(--fh);}
+  .dir{padding:5px 11px; font-size:12px; border-radius:8px;}
+  .dir.on{background:var(--closed); border-color:var(--closed); color:#0E1116;}
+  .col-head .cnt{font-size:14px; color:var(--muted); white-space:nowrap;}
+  .col-head .cnt b{font-size:22px; color:var(--text); font-weight:600; font-variant-numeric:tabular-nums; margin-right:3px;}
+  .canvas-wrap{flex:1; min-height:0; background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden;}
+  canvas{display:block; width:100%; height:100%;}
+
+  footer{flex:none; display:flex; flex-wrap:wrap; gap:8px 22px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:11px 16px; align-items:center;}
+  .item{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color:var(--muted);}
+  .item b{color:var(--text); font-weight:600;}
+  .dot{width:11px; height:11px; border-radius:50%; flex:none;}
+  .sep{width:1px; height:15px; background:var(--line);}
+</style>
+</head>
+<body>
+  <header>
+    <h1>A* Search with Heuristics — Dijkstra vs. A*</h1>
+    <div class="formula"><b>f(n)</b> = <span class="g">g(n)</span> + <span class="w">w</span> · <span class="h">h(n)</span></div>
+  </header>
+
+  <div class="controls">
+    <button class="primary" id="play">▶ Play both</button>
+    <button id="step">Step →</button>
+    <button id="reset">↻ Reset</button>
+    <button id="theme">☀ Light</button>
+    <div class="speed"><span class="lbl">Speed</span><button data-sp="0.5">0.5×</button><button data-sp="1" class="on">1×</button><button data-sp="2">2×</button></div>
+    <div class="verdict" id="verdict">Both searches find the same optimal path — watch how many nodes each one explores.</div>
+  </div>
+
+  <main>
+    <div class="col">
+      <div class="col-head">
+        <span class="name"><span id="name-d">Dijkstra</span>
+          <span class="tag"><span class="c-w">w</span> = 0</span>
+          <span class="tag"><span class="c-f">f(n)</span> = <span class="c-g">g(n)</span></span>
+          <button class="dir" id="dir-d">↔ Reverse (from goal)</button></span>
+        <span class="cnt"><b id="cnt-d">0</b>expanded</span>
+      </div>
+      <div class="canvas-wrap"><canvas id="cv-d"></canvas></div>
+    </div>
+    <div class="col">
+      <div class="col-head">
+        <span class="name">A*
+          <span class="tag"><span class="c-w">w</span> = 1</span>
+          <span class="tag"><span class="c-f">f(n)</span> = <span class="c-g">g(n)</span>+<span class="c-h">h(n)</span></span></span>
+        <span class="cnt"><b id="cnt-a">0</b>expanded</span>
+      </div>
+      <div class="canvas-wrap"><canvas id="cv-a"></canvas></div>
+    </div>
+  </main>
+
+  <footer>
+    <span class="item"><span class="dot" style="background:var(--start)"></span><b>Start</b></span>
+    <span class="item"><span class="dot" style="background:var(--goal)"></span><b>Goal</b></span>
+    <span class="item"><span class="dot" style="background:var(--open)"></span><b>Frontier (open)</b></span>
+    <span class="item"><span class="dot" style="background:var(--closed)"></span><b>Visited (closed)</b></span>
+    <span class="item"><span class="dot" style="background:var(--path)"></span><b>Path</b></span>
+    <div class="sep"></div>
+    <span class="item">numbers on edges = <b>edge cost</b></span>
+    <span class="item"><b>g(n)</b> cost start→n</span>
+    <span class="item"><b>h(n)</b> straight-line estimate n→goal</span>
+  </footer>
+
+<script>
+(function(){
+  const PAL={
+    dark:{edge:'#3A424E', node:'#62728C', start:'#E23B3B', goal:'#22C08A', open:'#12315E', closed:'#8FC2F5', path:'#F2913B', cur:'#3E86E8', wbg:'#171B22', wtxt:'#96A0AE', ring:'#0E1116', nodering:'rgba(255,255,255,0.28)'},
+    light:{edge:'#C4CBD4', node:'#8593A8', start:'#D63333', goal:'#12A66F', open:'#123A6B', closed:'#A9CEF5', path:'#E07E1F', cur:'#2E7BD6', wbg:'#FFFFFF', wtxt:'#5B6675', ring:'#FFFFFF', nodering:'rgba(0,0,0,0.18)'}
+  };
+  let C=PAL.dark;
+  let seed=20260724;
+  function rnd(){ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; }
+
+  const COLS=8, ROWS=5, SCALE=10;
+  const nodes=[], edges=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    nodes.push({lx:c+(rnd()-0.5)*0.5, ly:r+(rnd()-0.5)*0.55, x:0, y:0, adj:[]});
+  }
+  const N=nodes.length;
+  function ld(a,b){return Math.hypot(nodes[a].lx-nodes[b].lx, nodes[a].ly-nodes[b].ly);}
+  const thr=1.45;
+  for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){
+    if(ld(i,j)<thr && rnd()<0.85){ edges.push([i,j,Math.max(1,Math.round(ld(i,j)*SCALE))]); }
+  }
+  for(const [i,j,wt] of edges){ nodes[i].adj.push([j,wt]); nodes[j].adj.push([i,wt]); }
+  const START=Math.floor(ROWS/2)*COLS, GOAL=Math.floor(ROWS/2)*COLS+COLS-1;
+  function hdist(i,dst){return Math.round(Math.hypot(nodes[i].lx-nodes[dst].lx, nodes[i].ly-nodes[dst].ly)*SCALE);}
+
+  const panels=[
+    {w:0, reverse:false, cv:document.getElementById('cv-d'), cnt:document.getElementById('cnt-d')},
+    {w:1, reverse:false, cv:document.getElementById('cv-a'), cnt:document.getElementById('cnt-a')}
+  ];
+  panels.forEach(p=>{ p.ctx=p.cv.getContext('2d'); });
+
+  let W=0,H=0;
+  function layout(){
+    const dpr=window.devicePixelRatio||1;
+    const wrap=panels[0].cv.parentElement;
+    const cssW=wrap.clientWidth, cssH=wrap.clientHeight;
+    if(cssW<10||cssH<10) return;
+    const mx=Math.max(40,cssW*0.07), my=Math.max(40,cssH*0.11);
+    W=cssW; H=cssH;
+    for(const nd of nodes){ nd.x=mx+(nd.lx/(COLS-1))*(cssW-2*mx); nd.y=my+(nd.ly/(ROWS-1))*(cssH-2*my); }
+    panels.forEach(p=>{ p.ctx.setTransform(1,0,0,1,0,0); p.cv.width=cssW*dpr; p.cv.height=cssH*dpr; p.ctx.setTransform(dpr,0,0,dpr,0,0); draw(p); });
+  }
+
+  function newState(){ return {open:new Map(), closed:new Set(), came:new Map(), g:new Map(), done:false, path:null, exp:0, cur:null}; }
+  function resetPanel(p){
+    p.src = p.reverse ? GOAL : START;
+    p.dst = p.reverse ? START : GOAL;
+    const s=newState(); s.g.set(p.src,0); s.open.set(p.src, p.w*hdist(p.src,p.dst)); p.s=s;
+    p.cnt.textContent=0; draw(p);
+  }
+  function stepPanel(p){
+    const s=p.s; if(s.done) return false;
+    if(s.open.size===0){s.done=true; return false;}
+    let bk=null,bf=Infinity;
+    for(const [k,f] of s.open){ if(f<bf){bf=f;bk=k;} }
+    s.open.delete(bk); s.closed.add(bk); s.cur=bk; s.exp++;
+    if(bk===p.dst){ s.done=true; s.path=[]; let k=p.dst; while(k!==undefined){s.path.push(k); k=s.came.get(k);} p.cnt.textContent=s.exp; draw(p); return false; }
+    for(const [nb,ew] of nodes[bk].adj){
+      if(s.closed.has(nb)) continue;
+      const ng=s.g.get(bk)+ew;
+      if(!s.g.has(nb)||ng<s.g.get(nb)){ s.g.set(nb,ng); s.came.set(nb,bk); s.open.set(nb,ng+p.w*hdist(nb,p.dst)); }
+    }
+    p.cnt.textContent=s.exp; draw(p); return true;
+  }
+
+  function draw(p){
+    if(!W) return;
+    const ctx=p.ctx, s=p.s;
+    ctx.clearRect(0,0,W,H);
+    ctx.lineCap='round';
+    ctx.lineWidth=1.6; ctx.strokeStyle=C.edge;
+    for(const [a,b] of edges){ ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke(); }
+    if(s&&s.path){
+      ctx.lineWidth=4.5; ctx.strokeStyle=C.path;
+      for(let i=0;i<s.path.length-1;i++){ const a=s.path[i],b=s.path[i+1]; ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke(); }
+    }
+    ctx.font='11px -apple-system,Segoe UI,Roboto,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    for(const [a,b,wt] of edges){
+      const mxp=(nodes[a].x+nodes[b].x)/2, myp=(nodes[a].y+nodes[b].y)/2;
+      const t=String(wt), tw=ctx.measureText(t).width;
+      ctx.fillStyle=C.wbg; ctx.fillRect(mxp-tw/2-4, myp-8, tw+8, 16);
+      ctx.fillStyle=C.wtxt; ctx.fillText(t, mxp, myp);
+    }
+    for(let i=0;i<N;i++){
+      let col=C.node, rad=5;
+      if(s){
+        if(s.closed.has(i)){ col=C.closed; rad=6.5; }
+        if(s.open.has(i)){ col=C.open; rad=6.5; }
+        if(s.path&&s.path.includes(i)){ col=C.path; rad=7.5; }
+        if(i===s.cur&&!s.done){ col=C.cur; rad=9; }
+      }
+      const special=(i===START||i===GOAL);
+      if(i===START){ col=C.start; rad=11; }
+      if(i===GOAL){ col=C.goal; rad=11; }
+      ctx.beginPath(); ctx.arc(nodes[i].x,nodes[i].y,rad,0,7); ctx.fillStyle=col; ctx.fill();
+      if(special){ ctx.lineWidth=2.5; ctx.strokeStyle=C.ring; ctx.stroke(); }
+      else { ctx.lineWidth=1.2; ctx.strokeStyle=C.nodering; ctx.stroke(); }
+    }
+  }
+
+  const verdict=document.getElementById('verdict');
+  function checkDone(){
+    if(panels.every(p=>p.s.done)){
+      const d=panels[0].s.exp, a=panels[1].s.exp;
+      const pct=Math.round((1-a/d)*100);
+      const dName=panels[0].reverse?'reverse Dijkstra':'Dijkstra';
+      verdict.innerHTML='A* explored <b>'+a+'</b> nodes vs. '+dName+'’s <b>'+d+'</b> — that’s <b>'+pct+'% fewer</b>, same optimal path.';
+      return true;
+    }
+    return false;
+  }
+
+  let timer=null, speed=1;
+  const BASE=260;
+  const playBtn=document.getElementById('play');
+  function resetAll(){ panels.forEach(resetPanel); verdict.innerHTML='Both searches find the same optimal path — watch how many nodes each one explores.'; }
+  function tick(){ panels.forEach(stepPanel); if(panels.every(p=>p.s.done)){ setPlay(false); checkDone(); } }
+  function setPlay(on){
+    clearInterval(timer); timer=null;
+    if(on){ playBtn.textContent='❚❚ Pause'; timer=setInterval(tick, BASE/speed); }
+    else { playBtn.textContent='▶ Play both'; }
+  }
+  playBtn.onclick=()=>{ if(panels.every(p=>p.s.done)) resetAll(); setPlay(!timer); };
+  document.getElementById('step').onclick=()=>{ if(timer)setPlay(false); if(panels.every(p=>p.s.done)) resetAll(); panels.forEach(stepPanel); checkDone(); };
+  document.getElementById('reset').onclick=()=>{ setPlay(false); resetAll(); };
+
+  document.querySelectorAll('.speed button').forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('.speed button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on'); speed=parseFloat(b.dataset.sp);
+      if(timer){ setPlay(true); }
+    };
+  });
+
+  const themeBtn=document.getElementById('theme');
+  themeBtn.onclick=()=>{
+    const light=document.body.classList.toggle('light');
+    C = light ? PAL.light : PAL.dark;
+    themeBtn.textContent = light ? '🌙 Dark' : '☀ Light';
+    panels.forEach(draw);
+  };
+
+  const dirBtn=document.getElementById('dir-d'), nameD=document.getElementById('name-d');
+  dirBtn.onclick=()=>{
+    setPlay(false);
+    panels[0].reverse=!panels[0].reverse;
+    dirBtn.classList.toggle('on', panels[0].reverse);
+    dirBtn.textContent = panels[0].reverse ? '↔ Forward (from start)' : '↔ Reverse (from goal)';
+    nameD.textContent = panels[0].reverse ? 'Reverse Dijkstra' : 'Dijkstra';
+    resetAll();
+  };
+
+  window.addEventListener('keydown',e=>{
+    if(e.code==='Space'){ e.preventDefault(); playBtn.click(); }
+    else if(e.code==='ArrowRight'){ document.getElementById('step').click(); }
+    else if(e.code==='KeyR'){ document.getElementById('reset').click(); }
+  });
+  window.addEventListener('resize',layout);
+
+  layout(); resetAll();
+})();
+</script>
+</body>
+</html>
