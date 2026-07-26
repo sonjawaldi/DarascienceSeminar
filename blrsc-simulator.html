@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLRSC Simulator — Compute the Linear Route Skyline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0A0E1A;
+    --bg-panel:#121A2C;
+    --bg-panel-alt:#1A2338;
+    --border:#28324C;
+    --text-primary:#E8ECF5;
+    --text-muted:#8291B3;
+    --accent-cyan:#43D9C8;
+    --accent-cyan-dim:#1F4A47;
+    --accent-amber:#F5A623;
+    --accent-amber-dim:#4A3B18;
+    --accent-red:#E8615D;
+    --edge-default:#37425F;
+    --grey-dot:#4A567A;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 15% -10%, rgba(67,217,200,0.08), transparent 45%),
+      radial-gradient(ellipse at 100% 110%, rgba(245,166,35,0.06), transparent 45%),
+      var(--bg-deep);
+    color:var(--text-primary);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1280px; margin:0 auto;}
+
+  header{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap:20px; flex-wrap:wrap;
+    border-bottom:1px solid var(--border);
+    padding-bottom:20px; margin-bottom:24px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--accent-cyan); margin:0 0 8px;
+  }
+  h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:clamp(26px,4vw,38px);
+    font-weight:700; margin:0; letter-spacing:-0.01em;
+  }
+  header p.sub{
+    color:var(--text-muted); font-size:14px; max-width:480px; margin:8px 0 0;
+    line-height:1.5;
+  }
+  .src-link{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted);
+  }
+  .src-link a{color:var(--accent-cyan); text-decoration:none;}
+  .src-link a:hover{text-decoration:underline;}
+
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  .bottom-row{
+    display:grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap:20px;
+    margin-top:20px;
+    align-items:start;
+  }
+  @media (max-width:980px){ .layout, .bottom-row{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+  }
+  .panel h2{
+    font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600;
+    margin:0 0 14px; letter-spacing:0.02em; color:var(--text-primary);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;
+  }
+  .panel h2 small{font-family:'IBM Plex Mono',monospace; font-weight:400; color:var(--text-muted); font-size:11px;}
+
+  svg{width:100%; height:auto; display:block;}
+  .node-circle{transition:fill .35s ease, stroke .25s ease;}
+  .node-label{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px;
+    fill:var(--bg-deep); text-anchor:middle; dominant-baseline:central; pointer-events:none;
+  }
+  .edge-line{stroke:var(--edge-default); stroke-width:2; transition:stroke .3s ease, stroke-width .3s ease;}
+  .edge-weight{font-family:'IBM Plex Mono',monospace; font-size:10.5px; fill:var(--text-muted); text-anchor:middle; pointer-events:none;}
+  .edge-weight-bg{fill:var(--bg-panel);}
+
+  .weight-readout{
+    display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;
+  }
+  .weight-chip{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; padding:6px 12px;
+    background:var(--bg-panel-alt); border:1px solid var(--border); border-radius:99px;
+    color:var(--text-muted);
+  }
+  .weight-chip b{color:var(--accent-amber); font-weight:600;}
+
+  .step-desc{
+    margin-top:14px; padding:14px 16px; background:var(--bg-panel-alt);
+    border:1px solid var(--border); border-left:3px solid var(--accent-cyan);
+    border-radius:8px; font-size:13.5px; line-height:1.55; min-height:40px;
+  }
+  .step-desc .step-tag{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--accent-cyan);
+    text-transform:uppercase; letter-spacing:0.1em; display:block; margin-bottom:4px;
+  }
+
+  .controls{display:flex; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap;}
+  button{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:500;
+    background:var(--bg-panel-alt); color:var(--text-primary); border:1px solid var(--border);
+    border-radius:7px; padding:9px 14px; cursor:pointer; transition:all .15s ease;
+  }
+  button:hover:not(:disabled){border-color:var(--accent-cyan); color:var(--accent-cyan);}
+  button:disabled{opacity:0.35; cursor:not-allowed;}
+  button.primary{background:var(--accent-cyan); color:#082421; border-color:var(--accent-cyan); font-weight:600;}
+  button.primary:hover{filter:brightness(1.1);}
+  .spacer{flex:1;}
+  .speed-wrap{display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted);}
+  input[type=range]{accent-color:var(--accent-cyan); width:90px;}
+  .progress-track{height:4px; background:var(--border); border-radius:2px; margin-top:14px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--accent-cyan); width:0%; transition:width .3s ease;}
+
+  .legend-row{display:flex; gap:14px; flex-wrap:wrap; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted); margin-top:10px;}
+  .legend-row span{display:flex; align-items:center; gap:6px;}
+  .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
+
+  table{width:100%; border-collapse:collapse; font-family:'IBM Plex Mono',monospace; font-size:12px;}
+  th{text-align:left; color:var(--text-muted); font-weight:500; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; padding:0 8px 8px; border-bottom:1px solid var(--border);}
+  td{padding:7px 8px; border-bottom:1px solid rgba(255,255,255,0.04);}
+  tr.row-new td{background:rgba(245,166,35,0.09);}
+
+  pre.pcode{font-family:'IBM Plex Mono',monospace; font-size:11.8px; line-height:1.85; margin:0; white-space:pre-wrap; color:var(--text-muted);}
+  pre.pcode .ln{display:block; padding:2px 8px; border-radius:5px; border-left:2px solid transparent; transition:background .25s ease, color .25s ease, border-color .25s ease;}
+  pre.pcode .ln.active{background:rgba(67,217,200,0.1); color:var(--text-primary); border-left-color:var(--accent-cyan);}
+  pre.pcode .ln .num{color:#4A567A; margin-right:10px;}
+
+  footer{text-align:center; color:var(--text-muted); font-size:11.5px; margin-top:36px; font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <p class="eyebrow">Bicriteria networks · linear skyline</p>
+      <h1>BLRSC Simulator</h1>
+      <p class="sub">Divide and conquer over weight vectors: starting with two extreme paths (minimum time and minimum cost), weighted shortest-path searches recursively discover further Pareto-optimal paths.</p>
+    </div>
+    <p class="src-link">Based on Shekelyan et al., “Linear Path Skyline Computation in Bicriteria Networks”, 2014</p>
+  </header>
+
+  <div class="layout">
+    <!-- Graph -->
+    <div class="panel">
+      <h2>Network <small>two criteria per edge: time t / cost c</small></h2>
+      <svg id="graphSvg" viewBox="0 0 620 420" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="weight-readout" id="weightReadout"></div>
+      <div class="legend-row">
+        <span><i class="dot" style="background:var(--accent-amber)"></i>current search path</span>
+        <span><i class="dot" style="background:var(--accent-cyan)"></i>start / target</span>
+      </div>
+    </div>
+
+    <!-- Cost space -->
+    <div class="panel">
+      <h2>Criteria space <small id="skylineCounter">0 skyline paths found</small></h2>
+      <svg id="costSvg" viewBox="0 0 380 340" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="legend-row">
+        <span><i class="dot" style="background:var(--grey-dot)"></i>dominated path</span>
+        <span><i class="dot" style="background:var(--accent-cyan)"></i>skyline path</span>
+        <span><i class="dot" style="background:var(--accent-amber)"></i>path under test</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-row">
+    <div class="panel">
+      <h2>Simulation <small id="stepCounter">Step 0 / 0</small></h2>
+      <div class="step-desc" id="stepDesc">
+        <span class="step-tag" id="stepTag">Ready</span>
+        Select “Next” to start the simulation.
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="controls">
+        <button id="btnReset">⟲ Reset</button>
+        <button id="btnPrev">◀ Previous</button>
+        <button id="btnPlay" class="primary">▶ Play</button>
+        <button id="btnNext">Next ▶</button>
+        <div class="spacer"></div>
+        <div class="speed-wrap">
+          <span>Speed</span>
+          <input type="range" id="speedSlider" min="400" max="2600" step="100" value="1400">
+        </div>
+      </div>
+      <table style="margin-top:18px;">
+        <thead><tr><th>Skyline path</th><th>Route</th><th>Time t</th><th>Cost c</th></tr></thead>
+        <tbody id="skylineTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Pseudocode</h2>
+      <pre class="pcode" id="pcode"></pre>
+    </div>
+  </div>
+
+  <footer>BLRSC · linear (convex) route skyline over weight combinations — finds all supported Pareto-optimal paths</footer>
+</div>
+
+<script>
+/* ---------- Graph (bicriteria: time t, cost c) ---------- */
+const nodePos = {
+  S:{x:60,  y:210},
+  A:{x:230, y:80},
+  B:{x:230, y:210},
+  C:{x:230, y:340},
+  D:{x:420, y:150},
+  T:{x:560, y:210},
+};
+const edgesRaw = [
+  ['S','A',2,10],
+  ['S','B',5,4],
+  ['S','C',8,2],
+  ['A','D',3,6],
+  ['B','D',2,5],
+  ['B','T',6,3],
+  ['C','T',2,7],
+  ['D','T',3,2],
+];
+const adj = {};
+Object.keys(nodePos).forEach(n=>adj[n]=[]);
+edgesRaw.forEach(([a,b,t,c])=>adj[a].push({to:b,t,c}));
+
+/* ---------- Weighted shortest-path search (Dijkstra over a*t + b*c) ---------- */
+function weightedShortestPath(a,b){
+  const dist={}, prev={};
+  Object.keys(nodePos).forEach(n=>dist[n]=Infinity);
+  dist['S']=0;
+  const visited=new Set();
+  while(true){
+    let u=null,best=Infinity;
+    Object.keys(nodePos).forEach(id=>{ if(!visited.has(id) && dist[id]<best){best=dist[id];u=id;} });
+    if(u===null) break;
+    visited.add(u);
+    (adj[u]||[]).forEach(e=>{
+      const w = a*e.t + b*e.c;
+      if(dist[u]+w < dist[e.to]){ dist[e.to]=dist[u]+w; prev[e.to]=u; }
+    });
+  }
+  const path=[]; let cur='T';
+  while(cur){ path.unshift(cur); if(cur==='S') break; cur=prev[cur]; }
+  let t=0,c=0;
+  for(let i=0;i<path.length-1;i++){
+    const e = adj[path[i]].find(e=>e.to===path[i+1]);
+    t+=e.t; c+=e.c;
+  }
+  return {path, t, c};
+}
+
+/* ---------- All simple paths (only to visualize dominated points) ---------- */
+function enumerateAllPaths(){
+  const results=[];
+  function dfs(node, path, t, c){
+    if(node==='T'){ results.push({path:[...path], t, c}); return; }
+    (adj[node]||[]).forEach(e=>{
+      if(path.includes(e.to)) return;
+      dfs(e.to, [...path, e.to], t+e.t, c+e.c);
+    });
+  }
+  dfs('S', ['S'], 0, 0);
+  return results;
+}
+const allPaths = enumerateAllPaths();
+
+/* ---------- BLRSC: generate simulation steps ---------- */
+function computeSteps(){
+  const steps=[];
+  const skyline=[];
+  let idCounter=0;
+  function samePath(p1,p2){ return p1.length===p2.length && p1.every((v,i)=>v===p2[i]); }
+  function addPoint(res){
+    const id='P'+(++idCounter);
+    const pt={id,t:res.t,c:res.c,path:res.path};
+    skyline.push(pt);
+    return pt;
+  }
+  function snap(extra){
+    return {skyline:skyline.map(p=>({...p})), ...extra};
+  }
+
+  const r1 = weightedShortestPath(1,0);
+  const pLeft = addPoint(r1);
+  steps.push({type:'extreme-t', weight:[1,0], result:r1, testPoint:{t:r1.t,c:r1.c},
+    text:`Weight vector (1, 0): minimize time only. Result: path ${r1.path.join('→')} with (t=${r1.t}, c=${r1.c}) — the left extreme point of the skyline.`,
+    ...snap()});
+
+  const r2 = weightedShortestPath(0,1);
+  let pRight;
+  if(samePath(r2.path, r1.path)){ pRight = pLeft; }
+  else pRight = addPoint(r2);
+  steps.push({type:'extreme-c', weight:[0,1], result:r2, testPoint:{t:r2.t,c:r2.c},
+    text:`Weight vector (0, 1): minimize cost only. Result: path ${r2.path.join('→')} with (t=${r2.t}, c=${r2.c}) — the right extreme point of the skyline.`,
+    ...snap()});
+
+  const stack = [];
+  if(pLeft !== pRight) stack.push([pLeft, pRight]);
+
+  while(stack.length){
+    const [pA, pB] = stack.pop();
+    const a = pA.c - pB.c;
+    const b = pB.t - pA.t;
+    const res = weightedShortestPath(a,b);
+    const lineVal = a*pA.t + b*pA.c;
+    const newVal  = a*res.t + b*res.c;
+
+    steps.push({type:'candidate', weight:[a,b], result:res, segment:[pA,pB], lineVal, newVal, testPoint:{t:res.t,c:res.c},
+      text:`Between ${pA.id} (t=${pA.t}, c=${pA.c}) and ${pB.id} (t=${pB.t}, c=${pB.c}): use weight vector (${a}, ${b}), perpendicular to their connecting line. The weighted search returns ${res.path.join('→')} (t=${res.t}, c=${res.c}) → value ${newVal} versus line value ${lineVal}.`,
+      ...snap()});
+
+    if(newVal < lineVal - 1e-9){
+      const pNew = addPoint(res);
+      stack.push([pA, pNew]);
+      stack.push([pNew, pB]);
+      steps.push({type:'improve', point:pNew, segment:[pA,pB],
+        text:`${pNew.id} lies below the line ${pA.id}–${pB.id} → a new skyline point. Create two subproblems: (${pA.id}, ${pNew.id}) and (${pNew.id}, ${pB.id}).`,
+        ...snap()});
+    } else {
+      steps.push({type:'confirm', segment:[pA,pB],
+        text:`No path lies below the line ${pA.id}–${pB.id}. This edge is final — there is no further linear skyline point between these two points.`,
+        ...snap()});
+    }
+  }
+
+  const dominated = allPaths.filter(p => !skyline.some(s => samePath(s.path,p.path)));
+  steps.push({type:'done',
+    text:`Done. The linear route skyline contains ${skyline.length} paths${dominated.length? `. Path ${dominated.map(p=>p.path.join('→')).join(', ')} is dominated by a convex combination of two skyline paths and is never returned by a weighted search.`:'.'}`,
+    ...snap()});
+
+  return steps;
+}
+
+const steps = computeSteps();
+let stepIndex = 0;
+let playTimer = null;
+
+/* ---------- Pseudocode ---------- */
+const pcodeLines = [
+  "function BLRSC(graph, S, T):",
+  "  P_left  = ShortestPath(weight = (1, 0))",
+  "  P_right = ShortestPath(weight = (0, 1))",
+  "  skyline = { P_left, P_right }",
+  "  stack = [ (P_left, P_right) ]",
+  "  while stack not empty:",
+  "    (A, B) = stack.pop()",
+  "    (a, b) = perpendicular(A, B)",
+  "    P = ShortestPath(weight = (a, b))",
+  "    if weighted(P) < lineValue(A, B):",
+  "      skyline.add(P)",
+  "      stack.push((A, P)); stack.push((P, B))",
+  "  return skyline",
+];
+const lineMap = {
+  'extreme-t':[1], 'extreme-c':[2], 'candidate':[6,7,8,9],
+  'improve':[10,11], 'confirm':[9], 'done':[12],
+};
+function renderPcode(type){
+  const active = new Set(lineMap[type] || []);
+  document.getElementById('pcode').innerHTML = pcodeLines.map((l,i)=>{
+    const cls = active.has(i) ? 'ln active' : 'ln';
+    return `<span class="${cls}"><span class="num">${String(i).padStart(2,'0')}</span>${escapeHtml(l)}</span>`;
+  }).join('');
+}
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ---------- Graph-SVG ---------- */
+const gsvg = document.getElementById('graphSvg');
+function buildGraphSvg(){
+  let s='';
+  edgesRaw.forEach(([a,b,t,c])=>{
+    const na=nodePos[a], nb=nodePos[b];
+    const mx=(na.x+nb.x)/2, my=(na.y+nb.y)/2;
+    s+=`<line class="edge-line" id="edge-${a}-${b}" x1="${na.x}" y1="${na.y}" x2="${nb.x}" y2="${nb.y}"></line>`;
+    s+=`<rect class="edge-weight-bg" x="${mx-20}" y="${my-11}" width="40" height="16" rx="4"></rect>`;
+    s+=`<text class="edge-weight" x="${mx}" y="${my+1}">${t} / ${c}</text>`;
+  });
+  Object.entries(nodePos).forEach(([id,p])=>{
+    const isTerm = (id==='S'||id==='T');
+    s+=`<circle class="node-circle" id="node-${id}" cx="${p.x}" cy="${p.y}" r="22" fill="${isTerm?'#1F4A47':'#2C3654'}" stroke="${isTerm?'var(--accent-cyan)':'var(--edge-default)'}" stroke-width="2"></circle>`;
+    s+=`<text class="node-label" x="${p.x}" y="${p.y-1}">${id}</text>`;
+  });
+  gsvg.innerHTML = s;
+}
+
+/* ---------- Criteria-space SVG ---------- */
+const csvg = document.getElementById('costSvg');
+const plot = {padL:44, padT:16, padR:16, padB:38, w:380, h:340};
+plot.plotW = plot.w - plot.padL - plot.padR;
+plot.plotH = plot.h - plot.padT - plot.padB;
+const maxT = 13, maxC = 20;
+function px(t){ return plot.padL + (t/maxT)*plot.plotW; }
+function py(c){ return plot.padT + plot.plotH - (c/maxC)*plot.plotH; }
+
+function buildCostAxes(){
+  let s='';
+  // gridlines
+  for(let t=0;t<=maxT;t+=2){
+    s+=`<line x1="${px(t)}" y1="${plot.padT}" x2="${px(t)}" y2="${plot.padT+plot.plotH}" stroke="var(--border)" stroke-width="1"></line>`;
+    s+=`<text x="${px(t)}" y="${plot.padT+plot.plotH+16}" font-family="IBM Plex Mono" font-size="9" fill="var(--text-muted)" text-anchor="middle">${t}</text>`;
+  }
+  for(let c=0;c<=maxC;c+=4){
+    s+=`<line x1="${plot.padL}" y1="${py(c)}" x2="${plot.padL+plot.plotW}" y2="${py(c)}" stroke="var(--border)" stroke-width="1"></line>`;
+    s+=`<text x="${plot.padL-8}" y="${py(c)+3}" font-family="IBM Plex Mono" font-size="9" fill="var(--text-muted)" text-anchor="end">${c}</text>`;
+  }
+  s+=`<text x="${plot.padL+plot.plotW/2}" y="${plot.h-4}" font-family="IBM Plex Mono" font-size="10.5" fill="var(--text-muted)" text-anchor="middle">Time t →</text>`;
+  s+=`<text x="12" y="${plot.padT+plot.plotH/2}" font-family="IBM Plex Mono" font-size="10.5" fill="var(--text-muted)" text-anchor="middle" transform="rotate(-90 12 ${plot.padT+plot.plotH/2})">Cost c →</text>`;
+  return s;
+}
+
+/* ---------- Render each step ---------- */
+function renderStep(){
+  const step = steps[stepIndex];
+  if(!step) return;
+
+  // Graph: reset
+  edgesRaw.forEach(([a,b])=>{
+    const el = document.getElementById(`edge-${a}-${b}`);
+    el.setAttribute('stroke','var(--edge-default)');
+    el.setAttribute('stroke-width','2');
+  });
+  const pathToShow = step.result ? step.result.path : (step.point ? step.point.path : null);
+  if(pathToShow){
+    for(let i=0;i<pathToShow.length-1;i++){
+      const el = document.getElementById(`edge-${pathToShow[i]}-${pathToShow[i+1]}`);
+      if(el){ el.setAttribute('stroke','var(--accent-amber)'); el.setAttribute('stroke-width','3.5'); }
+    }
+  }
+
+  // weight readout
+  const w = step.weight;
+  document.getElementById('weightReadout').innerHTML = w
+    ? `<span class="weight-chip">Weight vector: (<b>${w[0]}</b>, <b>${w[1]}</b>)</span><span class="weight-chip">minimize ${w[0]}·t + ${w[1]}·c</span>`
+    : `<span class="weight-chip">kein aktiver Suchlauf</span>`;
+
+  // cost space
+  let cs = buildCostAxes();
+  const skylineIds = new Set(step.skyline.map(p=>p.id));
+  allPaths.forEach(p=>{
+    const isSky = step.skyline.some(s => s.t===p.t && s.c===p.c && s.path.join()===p.path.join());
+    if(isSky) return;
+    cs += `<circle cx="${px(p.t)}" cy="${py(p.c)}" r="5" fill="var(--grey-dot)" opacity="0.85"></circle>`;
+  });
+  const sorted = [...step.skyline].sort((a,b)=>a.t-b.t);
+  for(let i=0;i<sorted.length-1;i++){
+    cs += `<line x1="${px(sorted[i].t)}" y1="${py(sorted[i].c)}" x2="${px(sorted[i+1].t)}" y2="${py(sorted[i+1].c)}" stroke="var(--accent-cyan)" stroke-width="2"></line>`;
+  }
+  if(step.segment){
+    const [a,b] = step.segment;
+    cs += `<line x1="${px(a.t)}" y1="${py(a.c)}" x2="${px(b.t)}" y2="${py(b.c)}" stroke="var(--accent-amber)" stroke-width="1.5" stroke-dasharray="5,4"></line>`;
+  }
+  sorted.forEach(p=>{
+    cs += `<circle cx="${px(p.t)}" cy="${py(p.c)}" r="6.5" fill="var(--accent-cyan)" stroke="var(--bg-panel)" stroke-width="2"></circle>`;
+    cs += `<text x="${px(p.t)}" y="${py(p.c)-11}" font-family="IBM Plex Mono" font-size="10" fill="var(--accent-cyan)" text-anchor="middle">${p.id}</text>`;
+  });
+  if(step.testPoint && (step.type==='candidate')){
+    cs += `<circle cx="${px(step.testPoint.t)}" cy="${py(step.testPoint.c)}" r="8" fill="none" stroke="var(--accent-amber)" stroke-width="2.5"></circle>`;
+  }
+  csvg.innerHTML = cs;
+
+  // description
+  const tagMap = {
+    'extreme-t':'Extreme point · time', 'extreme-c':'Extreme point · cost', 'candidate':'Test candidate',
+    'improve':'New skyline point', 'confirm':'Edge confirmed', 'done':'Done'
+  };
+  document.getElementById('stepDesc').innerHTML = `<span class="step-tag">${tagMap[step.type]||''}</span>${step.text}`;
+
+  // table
+  const tbody = document.getElementById('skylineTableBody');
+  tbody.innerHTML = step.skyline.map(p=>{
+    const isNew = step.point && step.point.id===p.id;
+    return `<tr class="${isNew?'row-new':''}"><td>${p.id}</td><td>${p.path.join('→')}</td><td>${p.t}</td><td>${p.c}</td></tr>`;
+  }).join('') || `<tr><td colspan="4" style="color:var(--text-muted)">No skyline paths yet</td></tr>`;
+
+  renderPcode(step.type);
+  document.getElementById('skylineCounter').textContent = `${step.skyline.length} skyline ${step.skyline.length === 1 ? 'path' : 'paths'} found`;
+  document.getElementById('stepCounter').textContent = `Step ${stepIndex} / ${steps.length-1}`;
+  document.getElementById('progressFill').style.width = `${(stepIndex/(steps.length-1))*100}%`;
+  document.getElementById('btnPrev').disabled = stepIndex===0;
+  document.getElementById('btnNext').disabled = stepIndex===steps.length-1;
+  if(stepIndex===steps.length-1) stopPlay();
+}
+
+/* ---------- Steuerung ---------- */
+function goNext(){ if(stepIndex<steps.length-1){ stepIndex++; renderStep(); } }
+function goPrev(){ if(stepIndex>0){ stepIndex--; renderStep(); } }
+function goReset(){ stopPlay(); stepIndex=0; renderStep(); }
+function togglePlay(){
+  if(playTimer){ stopPlay(); return; }
+  document.getElementById('btnPlay').textContent = '⏸ Pause';
+  playTimer = setInterval(()=>{
+    if(stepIndex>=steps.length-1){ stopPlay(); return; }
+    goNext();
+  }, Number(document.getElementById('speedSlider').value));
+}
+function stopPlay(){
+  if(playTimer){ clearInterval(playTimer); playTimer=null; }
+  document.getElementById('btnPlay').textContent = '▶ Play';
+}
+document.getElementById('btnNext').addEventListener('click', ()=>{ stopPlay(); goNext(); });
+document.getElementById('btnPrev').addEventListener('click', ()=>{ stopPlay(); goPrev(); });
+document.getElementById('btnReset').addEventListener('click', goReset);
+document.getElementById('btnPlay').addEventListener('click', togglePlay);
+document.getElementById('speedSlider').addEventListener('input', ()=>{ if(playTimer){ stopPlay(); togglePlay(); } });
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight'){ stopPlay(); goNext(); }
+  if(e.key==='ArrowLeft'){ stopPlay(); goPrev(); }
+  if(e.key===' '){ e.preventDefault(); togglePlay(); }
+});
+
+buildGraphSvg();
+renderStep();
+</script>
+</body>
+</html>

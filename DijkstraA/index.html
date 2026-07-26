@@ -456,8 +456,8 @@
 <script>
 (function(){
   const PAL={
-    dark:{edge:'#3A424E', node:'#62728C', start:'#E23B3B', goal:'#22C08A', open:'#12315E', closed:'#8FC2F5', path:'#F2913B', cur:'#3E86E8', wbg:'#171B22', wtxt:'#96A0AE', ring:'#0E1116', nodering:'rgba(255,255,255,0.28)'},
-    light:{edge:'#C4CBD4', node:'#8593A8', start:'#D63333', goal:'#12A66F', open:'#123A6B', closed:'#A9CEF5', path:'#E07E1F', cur:'#2E7BD6', wbg:'#FFFFFF', wtxt:'#5B6675', ring:'#FFFFFF', nodering:'rgba(0,0,0,0.18)'}
+    dark:{edge:'#3A424E', visited:'#000000', node:'#62728C', start:'#E23B3B', goal:'#22C08A', open:'#12315E', closed:'#8FC2F5', path:'#F2913B', cur:'#3E86E8', wbg:'#171B22', wtxt:'#96A0AE', ring:'#0E1116', nodering:'rgba(255,255,255,0.28)'},
+    light:{edge:'#C4CBD4', visited:'#000000', node:'#8593A8', start:'#D63333', goal:'#12A66F', open:'#123A6B', closed:'#A9CEF5', path:'#E07E1F', cur:'#2E7BD6', wbg:'#FFFFFF', wtxt:'#5B6675', ring:'#FFFFFF', nodering:'rgba(0,0,0,0.18)'}
   };
   let C=PAL.dark;
   let seed=20260724;
@@ -469,10 +469,13 @@
     nodes.push({lx:c+(rnd()-0.5)*0.5, ly:r+(rnd()-0.5)*0.55, x:0, y:0, adj:[]});
   }
   const N=nodes.length;
+  const omittedNodes=new Set([COLS-1]);
   function ld(a,b){return Math.hypot(nodes[a].lx-nodes[b].lx, nodes[a].ly-nodes[b].ly);}
   const thr=1.45;
   for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){
-    if(ld(i,j)<thr && rnd()<0.85){ edges.push([i,j,Math.max(1,Math.round(ld(i,j)*SCALE))]); }
+    if(ld(i,j)<thr && rnd()<0.85 && !omittedNodes.has(i) && !omittedNodes.has(j)){
+      edges.push([i,j,Math.max(1,Math.round(ld(i,j)*SCALE))]);
+    }
   }
   for(const [i,j,wt] of edges){ nodes[i].adj.push([j,wt]); nodes[j].adj.push([i,wt]); }
   const START=Math.floor(ROWS/2)*COLS, GOAL=Math.floor(ROWS/2)*COLS+COLS-1;
@@ -531,6 +534,13 @@
     ctx.lineCap='round';
     ctx.lineWidth=1.6; ctx.strokeStyle=C.edge;
     for(const [a,b] of edges){ ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke(); }
+    if(s){
+      ctx.lineWidth=3; ctx.strokeStyle=C.visited;
+      for(const [node,parent] of s.came){
+        if(!s.closed.has(node)) continue;
+        ctx.beginPath(); ctx.moveTo(nodes[parent].x,nodes[parent].y); ctx.lineTo(nodes[node].x,nodes[node].y); ctx.stroke();
+      }
+    }
     if(s&&s.path){
       ctx.lineWidth=4.5; ctx.strokeStyle=C.path;
       for(let i=0;i<s.path.length-1;i++){ const a=s.path[i],b=s.path[i+1]; ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke(); }
@@ -543,6 +553,7 @@
       ctx.fillStyle=C.wtxt; ctx.fillText(t, mxp, myp);
     }
     for(let i=0;i<N;i++){
+      if(omittedNodes.has(i)) continue;
       let col=C.node, rad=5;
       if(s){
         if(s.closed.has(i)){ col=C.closed; rad=6.5; }
