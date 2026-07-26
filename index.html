@@ -46,14 +46,15 @@
     body {
       margin: 0;
       min-height: 100vh;
+      min-height: 100dvh;
       font-family: Arial, Helvetica, sans-serif;
       background: linear-gradient(135deg, var(--bg), var(--bg-end));
       color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
-      padding: 24px;
+      gap: clamp(12px, 2.2vh, 24px);
+      padding: clamp(12px, 2.2vh, 24px);
       position: relative;
       overflow-x: hidden;
     }
@@ -83,10 +84,10 @@
       width: min(820px, 100%);
       min-width: 0;
       max-width: 100%;
-      padding: 64px 0 80px;
+      padding: clamp(24px, 5.5vh, 64px) 0 clamp(32px, 6.5vh, 80px);
       text-align: center;
     }
-    .card { margin: auto 0; }
+    .card { margin: 0; }
     .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -108,7 +109,7 @@
     h1 {
       max-width: 760px;
       margin: 0 auto 18px;
-      font-size: clamp(2.6rem, 7vw, 5.3rem);
+      font-size: clamp(2.6rem, min(6.4vw, 7.6vh), 5.3rem);
       line-height: 0.98;
       letter-spacing: -0.06em;
     }
@@ -135,11 +136,11 @@
     .algorithm-tree {
       width: 100%;
       min-width: 0;
-      margin-top: 34px;
+      margin-top: clamp(22px, 3.5vh, 34px);
       display: grid;
       grid-template-columns: minmax(0, 1fr) clamp(20px, 4vw, 42px) minmax(0, 1fr) clamp(32px, 6vw, 68px) minmax(0, 1fr) clamp(20px, 4vw, 42px) minmax(0, 1fr);
       grid-template-rows: repeat(2, auto);
-      row-gap: 26px;
+      row-gap: clamp(16px, 2.8vh, 26px);
       align-items: center;
     }
     .algorithm-tree-scroll {
@@ -334,6 +335,21 @@
     }
 
     /* Mobile Responsive */
+    @media (max-width: 1100px) {
+      .card {
+        width: min(760px, 100%);
+      }
+      h1 {
+        font-size: clamp(2.8rem, 7vw, 4.5rem);
+      }
+      .algorithm-tree {
+        grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr) 42px minmax(0, 1fr) 24px minmax(0, 1fr);
+      }
+      .algorithm-node .button {
+        padding-inline: 10px 38px;
+      }
+    }
+
     @media (max-width: 768px) {
       body {
         padding: 16px;
@@ -343,6 +359,7 @@
         padding: 48px 0 64px;
       }
       h1 {
+        font-size: clamp(2.35rem, 11vw, 4rem);
         letter-spacing: -0.045em;
       }
       p {
@@ -477,6 +494,7 @@
         padding: 40px 0 48px;
       }
       h1 {
+        font-size: clamp(2rem, 10.5vw, 2.8rem);
         margin-bottom: 16px;
       }
       p {
@@ -485,6 +503,33 @@
       a.button {
         padding: 12px 14px;
         font-size: 0.9rem;
+      }
+    }
+
+    @media (max-height: 820px) and (min-width: 769px) {
+      .card {
+        width: min(760px, 100%);
+        padding-block: 14px 22px;
+      }
+      .eyebrow {
+        margin-bottom: 10px;
+      }
+      h1 {
+        max-width: 680px;
+        margin-bottom: 12px;
+        font-size: clamp(2.6rem, 7vh, 4rem);
+      }
+      p {
+        font-size: 0.96rem;
+        line-height: 1.5;
+      }
+      .algorithm-tree {
+        margin-top: 18px;
+        row-gap: 14px;
+      }
+      .algorithm-node .button {
+        min-height: 54px;
+        padding-block: 9px;
       }
     }
   </style>

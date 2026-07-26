@@ -139,7 +139,7 @@
     <div class="range-wrap">
       <span class="stepnum">Linear bound</span>
       <span class="stepnum">tight</span>
-      <input type="range" id="bound" min="29" max="38" step="1" value="37">
+      <input type="range" id="bound" min="29" max="38" step="any" value="37">
       <span class="stepnum">loose</span>
     </div>
     <div class="verdict" id="prunecount">candidate paths: 9 / 9</div>
@@ -329,7 +329,7 @@
     }
     // label the bound line
     ctx.fillStyle=C.keep; ctx.font='600 13px -apple-system,Segoe UI,sans-serif'; ctx.textAlign='left'; ctx.textBaseline='bottom';
-    ctx.fillText('p(n) = time + distance = '+k, x1+8, y1+16);
+    ctx.fillText('p(n) = time + distance = '+formatBound(k), x1+8, y1+16);
   }
 
   function draw(){ AXT=26; AXL=26; drawMapPrune(); drawPlotPrune(); }
@@ -337,12 +337,15 @@
   const narrEl=document.getElementById('narr');
   const boundSlider=document.getElementById('bound'), pruneCount=document.getElementById('prunecount');
   const routeCount=document.getElementById('routecount-l'), boundValue=document.getElementById('boundvalue');
+  function formatBound(value){
+    return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/0$/,'');
+  }
   function narrPrune(){
     const n=prunedRoutes().size, left=paths.length-n;
     pruneCount.textContent='candidate paths: '+left+' / '+paths.length;
     pruneCount.style.color = (left<=2) ? 'var(--keep)' : 'var(--prune)';
     routeCount.textContent=left;
-    boundValue.textContent=kbound;
+    boundValue.textContent=formatBound(kbound);
     narrEl.innerHTML='Each path is represented by its two criteria: travel time and distance. BLRSC retains paths that are optimal for a linear weighting of these criteria. This simplified equal-weight example uses <b>p(n) = time + distance</b>; paths above the bound are pruned. Move the bound toward the origin to obtain a smaller set of linearly optimal alternatives.';
   }
   boundSlider.oninput=()=>{ kbound=parseFloat(boundSlider.value); narrPrune(); draw(); };
