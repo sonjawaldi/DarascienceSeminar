@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Board — Board — Data Science Seminar</title>
+<style>
+  :root {
+    --bg: #fbfaf9;
+    --surface: #ffffff;
+    --border: #e4e0da;
+    --text: #26231f;
+    --muted: #6f6a63;
+    --accent: #7a6a55;
+    --chip-bg: #f0ece6;
+    --shadow: 0 1px 2px rgba(30,26,20,.06), 0 1px 8px rgba(30,26,20,.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1815;
+      --surface: #232019;
+      --border: #38332b;
+      --text: #ece7df;
+      --muted: #9d968b;
+      --accent: #c3b294;
+      --chip-bg: #302b23;
+      --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2.5rem 1.5rem 4rem;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  header { max-width: 1240px; margin: 0 auto 2rem; }
+  h1 { margin: 0 0 .35rem; font-size: 1.4rem; font-weight: 600; letter-spacing: -.01em; }
+  header p { margin: 0; color: var(--muted); font-size: .875rem; }
+  header code { background: var(--chip-bg); padding: .1em .4em; border-radius: 4px; font-size: .9em; }
+  .board {
+    max-width: 1240px; margin: 0 auto;
+    display: grid; gap: 1rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  @media (max-width: 1000px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 620px)  { .board { grid-template-columns: 1fr; } }
+  .column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: .9rem .8rem 1rem;
+  }
+  .column h2 {
+    margin: 0 0 .8rem; padding: 0 .2rem;
+    font-size: .74rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .07em;
+    color: var(--muted);
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .count {
+    background: var(--chip-bg); color: var(--muted);
+    border-radius: 999px; padding: .05rem .45rem;
+    font-size: .78em; letter-spacing: 0;
+  }
+  .column ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: .6rem .7rem .65rem;
+    box-shadow: var(--shadow);
+  }
+  .card-head { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin-bottom: .3rem; }
+  .id { font: 600 .7rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); letter-spacing: .02em; }
+  .title { margin: 0; font-size: .875rem; font-weight: 500; }
+  .note { margin: .3rem 0 0; font-size: .78rem; color: var(--muted); }
+  .note code {
+    font: .93em/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--chip-bg); padding: .1em .3em; border-radius: 3px;
+    overflow-wrap: anywhere;
+  }
+  .label {
+    font-size: .65rem; font-weight: 600; letter-spacing: .03em;
+    text-transform: uppercase;
+    padding: .1rem .38rem; border-radius: 4px;
+    background: var(--chip-bg); color: var(--muted);
+  }
+  .label-bug     { background: #f7dcd6; color: #8c3a26; }
+  .label-feature { background: #d9e6da; color: #2f5c3a; }
+  .label-docs    { background: #dee2ef; color: #37477a; }
+  .label-cleanup { background: #f2e6cd; color: #77551d; }
+  .label-infra   { background: #e2dced; color: #53407a; }
+  @media (prefers-color-scheme: dark) {
+    .label-bug     { background: #4a2820; color: #f0b9a8; }
+    .label-feature { background: #24402c; color: #a8ceb2; }
+    .label-docs    { background: #262f4c; color: #b1bee4; }
+    .label-cleanup { background: #453619; color: #ddc188; }
+    .label-infra   { background: #332a4c; color: #c0b0e0; }
+  }
+  .empty { color: var(--muted); font-size: .8rem; font-style: italic; padding: .3rem .2rem; }
+  footer { max-width: 1240px; margin: 2rem auto 0; color: var(--muted); font-size: .78rem; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Board — Data Science Seminar</h1>
+    <p>Generiert aus <code>BOARD.md</code> — Stand 2026-07-30</p>
+  </header>
+  <main class="board">
+      <section class="column" data-column="Backlog">
+        <h2>Backlog <span class="count">3</span></h2>
+        <ul>
+          <li class="card">
+            <div class="card-head">
+              <span class="id">T-007</span>
+              <span class="label label-cleanup">cleanup</span>
+            </div>
+            <p class="title">Ordnernamen vereinheitlichen</p>
+            <p class="note">BLRS2, BRSC, BRSC2, DijkstraA, Linear folgen keinem gemeinsamen Schema</p>
+          </li>
+          <li class="card">
+            <div class="card-head">
+              <span class="id">T-008</span>
+              <span class="label label-cleanup">cleanup</span>
+            </div>
+            <p class="title">Alte Dateiversionen aufräumen</p>
+            <p class="note"><code>Datascience_Projekt (13).pdf</code> und <code>ASTAR-~1.HTM</code> sehen nach Zufallsständen aus</p>
+          </li>
+          <li class="card">
+            <div class="card-head">
+              <span class="id">T-009</span>
+              <span class="label label-cleanup">cleanup</span>
+            </div>
+            <p class="title">responsive-test.html klären</p>
+            <p class="note">Test-Artefakt: behalten und dokumentieren oder entfernen</p>
+          </li></ul>
+      </section>
+      <section class="column" data-column="To Do">
+        <h2>To Do <span class="count">3</span></h2>
+        <ul>
+          <li class="card">
+            <div class="card-head">
+              <span class="id">T-001</span>
+              <span class="label label-bug">bug</span>
+            </div>
+            <p class="title">Toten Link /BC-IRNN/ reparieren</p>
+            <p class="note">in index.html und impressum.html verlinkt, aber der Ordner existiert nicht; nginx liefert dafür 404</p>
+          </li>
+          <li class="card">
+            <div class="card-head">
+              <span class="id">T-002</span>
+              <span class="label label-docs">docs</span>
+            </div>
+            <p class="title">README anlegen</p>
+            <p class="note">Repo hat keins; Kurzbeschreibung, Setup, wie man die Simulatoren startet</p>
+          </li>
+          <li class="card">
+            <div class="card-head">
+              <span class="id">T-003</span>
+              <span class="label label-docs">docs</span>
+            </div>
+            <p class="title">Startanleitung dokumentieren</p>
+            <p class="note"><code>npm start</code> (server.js, Port 3000) vs. Docker Compose vs. start-dijkstraa.cmd</p>
+          </li></ul>
+      </section>
+      <section class="column" data-column="In Progress">
+        <h2>In Progress <span class="count">0</span></h2>
+        <ul><li class="empty">nichts hier</li></ul>
+      </section>
+      <section class="column" data-column="Done">
+        <h2>Done <span class="count">3</span></h2>
+        <ul>
+          <li class="card">
+            <div class="card-head">
+              <span class="id">T-004</span>
+              <span class="label label-feature">feature</span>
+            </div>
+            <p class="title">BRSC-Implementierung korrigieren</p>
+            <p class="note">Commit &quot;new &amp; correct BRSC&quot;</p>
+          </li>
+          <li class="card">
+            <div class="card-head">
+              <span class="id">T-005</span>
+              <span class="label label-feature">feature</span>
+            </div>
+            <p class="title">Oberfläche auf Englisch umstellen</p>
+            <p class="note">Commit &quot;change everything into english&quot;</p>
+          </li>
+          <li class="card">
+            <div class="card-head">
+              <span class="id">T-006</span>
+              <span class="label label-feature">feature</span>
+            </div>
+            <p class="title">Responsive Design umsetzen</p>
+            <p class="note">dokumentiert in RESPONSIVE_DESIGN.md und RESPONSIVE_IMPLEMENTIERUNG.md</p>
+          </li></ul>
+      </section>
+  </main>
+  <footer>Zum Ändern die Karten in BOARD.md verschieben, dann <code>node build-board.js</code> laufen lassen.</footer>
+</body>
+</html>
